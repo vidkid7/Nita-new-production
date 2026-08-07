@@ -42,3 +42,5 @@ Thumbs.db
 *.tmp.txt
 *.tmp
 jwt_secret.*
+.vercel
+.env*
