@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import OpenAI from 'openai';
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -9,26 +7,9 @@ interface ChatMessage {
 
 @Injectable()
 export class ChatbotService {
-  private openai: OpenAI | null = null;
   private systemPrompt: string;
-  private readonly apiKey: string | undefined;
 
-  constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get('OPENAI_API_KEY');
-    if (this.apiKey) {
-      try {
-        this.openai = new OpenAI({ apiKey: this.apiKey });
-      } catch (err) {
-        // Defensive: if OpenAI client construction fails for any reason, log and
-        // keep the service alive so the rest of the app can boot. The chat()
-        // method will surface a friendly "not configured" error to the caller.
-        console.warn('[chatbot] OpenAI client init failed; chatbot will be disabled:', err?.message || err);
-        this.openai = null;
-      }
-    } else {
-      console.warn('[chatbot] OPENAI_API_KEY not set; chatbot will be disabled until configured.');
-    }
-
+  constructor() {
     this.systemPrompt = `You are a helpful assistant for Nita Clinics. Your role is to help:
     
 1. **Patients**: Answer questions about services, appointment booking, clinic timings, and general wellness queries.
@@ -60,28 +41,13 @@ Working Hours:
     message: string,
     conversationHistory: ChatMessage[] = [],
   ): Promise<string> {
-    if (!this.openai) {
-      return "Our AI assistant is not configured right now. Please call us at 0145-92100 or use the booking form and our team will help you directly.";
-    }
-    try {
-      const messages: ChatMessage[] = [
-        { role: 'system', content: this.systemPrompt },
-        ...conversationHistory,
-        { role: 'user', content: message },
-      ];
-
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages,
-        max_tokens: 500,
-        temperature: 0.7,
-      });
-
-      return response.choices[0]?.message?.content || "I'm sorry, I couldn't process your request. Please try again.";
-    } catch (error) {
-      console.error('Chatbot error:', error);
-      return "I'm experiencing technical difficulties. Please try again later or contact us directly at 0145-92100.";
-    }
+    // AI assistant is intentionally disabled. We surface a friendly fallback
+    // so the rest of the app (and the chat UI) keeps working without an
+    // OpenAI integration. To re-enable, reintroduce the OpenAI client and
+    // call it here.
+    void message;
+    void conversationHistory;
+    return "Our AI assistant is offline right now. Please call us at 0145-92100 or use the booking form and our team will help you directly.";
   }
 
   async getQuickResponses(): Promise<{ question: string; answer: string }[]> {
