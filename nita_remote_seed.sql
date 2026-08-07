@@ -7,7 +7,9 @@
 CREATE SCHEMA IF NOT EXISTS nita;
 SET search_path TO nita, public;
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Supabase has pgcrypto preinstalled (uuid-ossp is not enabled by default).
+-- pgcrypto provides gen_random_uuid() which is API-compatible with uuid_generate_v4().
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TYPE nita.appointments_status_enum AS ENUM ('pending', 'confirmed', 'cancelled', 'completed', 'no_show');
 CREATE TYPE nita.checkup_packages_category_enum AS ENUM ('female_general', 'female_premium', 'male_general', 'male_premium', 'tuberculosis', 'pediatrics', 'gynecology');
@@ -34,7 +36,7 @@ CREATE TYPE nita.users_role_enum AS ENUM ('super_admin', 'admin', 'staff', 'pati
 
 -- Table: nita.users
 CREATE TABLE IF NOT EXISTS nita.users (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "email" character varying NOT NULL,
@@ -61,7 +63,7 @@ INSERT INTO nita.users ("id", "created_at", "updated_at", "email", "password", "
 
 -- Table: nita.departments
 CREATE TABLE IF NOT EXISTS nita.departments (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -86,7 +88,7 @@ INSERT INTO nita.departments ("id", "created_at", "updated_at", "name", "slug", 
 
 -- Table: nita.doctors
 CREATE TABLE IF NOT EXISTS nita.doctors (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "user_id" uuid,
@@ -121,7 +123,7 @@ INSERT INTO nita.doctors ("id", "created_at", "updated_at", "user_id", "name", "
 
 -- Table: nita.appointments
 CREATE TABLE IF NOT EXISTS nita.appointments (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "doctor_id" uuid,
@@ -148,7 +150,7 @@ Verify appointment via audit', NULL, false, false);
 
 -- Table: nita.blog_posts
 CREATE TABLE IF NOT EXISTS nita.blog_posts (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "title" character varying NOT NULL,
@@ -175,7 +177,7 @@ ALTER TABLE nita.blog_posts ADD CONSTRAINT "FK_c3fc4a3a656aad74331acfcf2a9" FORE
 
 -- Table: nita.checkup_packages
 CREATE TABLE IF NOT EXISTS nita.checkup_packages (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -209,7 +211,7 @@ INSERT INTO nita.checkup_packages ("id", "created_at", "updated_at", "name", "ca
 
 -- Table: nita.clinics
 CREATE TABLE IF NOT EXISTS nita.clinics (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -237,7 +239,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "UQ_1c4933755297e407da44d46031c" ON nita.clini
 
 -- Table: nita.doctor_availabilities
 CREATE TABLE IF NOT EXISTS nita.doctor_availabilities (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "doctor_id" uuid NOT NULL,
@@ -304,7 +306,7 @@ INSERT INTO nita.doctor_availabilities ("id", "created_at", "updated_at", "docto
 
 -- Table: nita.doctor_leaves
 CREATE TABLE IF NOT EXISTS nita.doctor_leaves (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "doctor_id" uuid NOT NULL,
@@ -321,7 +323,7 @@ ALTER TABLE nita.doctor_leaves ADD CONSTRAINT "FK_d9896f0becfc0dba8b724c5459b" F
 
 -- Table: nita.enquiries
 CREATE TABLE IF NOT EXISTS nita.enquiries (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "type" nita.enquiries_type_enum NOT NULL DEFAULT 'general'::nita.enquiries_type_enum,
@@ -360,7 +362,7 @@ INSERT INTO nita.enquiries ("id", "created_at", "updated_at", "type", "name", "e
 
 -- Table: nita.health_card_applications
 CREATE TABLE IF NOT EXISTS nita.health_card_applications (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "holderType" nita.health_card_applications_holdertype_enum NOT NULL,
@@ -400,7 +402,7 @@ INSERT INTO nita.health_card_applications ("id", "created_at", "updated_at", "ho
 
 -- Table: nita.health_card_categories
 CREATE TABLE IF NOT EXISTS nita.health_card_categories (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -429,7 +431,7 @@ INSERT INTO nita.health_card_categories ("id", "created_at", "updated_at", "name
 
 -- Table: nita.patients
 CREATE TABLE IF NOT EXISTS nita.patients (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "user_id" uuid,
@@ -464,7 +466,7 @@ INSERT INTO nita.patients ("id", "created_at", "updated_at", "user_id", "full_na
 
 -- Table: nita.lab_orders
 CREATE TABLE IF NOT EXISTS nita.lab_orders (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "order_number" character varying NOT NULL,
@@ -492,7 +494,7 @@ ALTER TABLE nita.lab_orders ADD CONSTRAINT "FK_b2d20a4e73dd2b139e08db51e8f" FORE
 
 -- Table: nita.home_collections
 CREATE TABLE IF NOT EXISTS nita.home_collections (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "order_id" uuid,
@@ -525,7 +527,7 @@ INSERT INTO nita.home_collections ("id", "created_at", "updated_at", "order_id",
 
 -- Table: nita.lab_order_items
 CREATE TABLE IF NOT EXISTS nita.lab_order_items (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "order_id" uuid NOT NULL,
@@ -544,7 +546,7 @@ ALTER TABLE nita.lab_order_items ADD CONSTRAINT "FK_9ec251f9ba811b2e24bb0c41a7e"
 
 -- Table: nita.lab_reports
 CREATE TABLE IF NOT EXISTS nita.lab_reports (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "order_id" character varying,
@@ -568,7 +570,7 @@ ALTER TABLE nita.lab_reports ADD CONSTRAINT "FK_abcc2ecb1b4c68ae0eebde502e5" FOR
 
 -- Table: nita.lab_test_categories
 CREATE TABLE IF NOT EXISTS nita.lab_test_categories (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -593,7 +595,7 @@ INSERT INTO nita.lab_test_categories ("id", "created_at", "updated_at", "name", 
 
 -- Table: nita.lab_tests
 CREATE TABLE IF NOT EXISTS nita.lab_tests (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -658,7 +660,7 @@ INSERT INTO nita.lab_tests ("id", "created_at", "updated_at", "name", "slug", "c
 
 -- Table: nita.media_files
 CREATE TABLE IF NOT EXISTS nita.media_files (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -680,7 +682,7 @@ ALTER TABLE nita.media_files ADD CONSTRAINT "media_files_pkey" PRIMARY KEY ("id"
 
 -- Table: nita.page_content
 CREATE TABLE IF NOT EXISTS nita.page_content (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "page_slug" character varying NOT NULL,
@@ -696,7 +698,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "UQ_f04e4efd8e1815ddec794e163bb" ON nita.page_
 
 -- Table: nita.partners
 CREATE TABLE IF NOT EXISTS nita.partners (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -715,7 +717,7 @@ ALTER TABLE nita.partners ADD CONSTRAINT "partners_pkey" PRIMARY KEY ("id");
 
 -- Table: nita.payment_transactions
 CREATE TABLE IF NOT EXISTS nita.payment_transactions (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "reference" character varying NOT NULL,
@@ -745,7 +747,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "IDX_e612d69ed822a1d769e8958608" ON nita.payme
 
 -- Table: nita.services
 CREATE TABLE IF NOT EXISTS nita.services (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -769,7 +771,7 @@ ALTER TABLE nita.services ADD CONSTRAINT "FK_fe8dcab94e4095af071399c6523" FOREIG
 
 -- Table: nita.settings
 CREATE TABLE IF NOT EXISTS nita.settings (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "key" character varying NOT NULL,
@@ -786,7 +788,7 @@ INSERT INTO nita.settings ("id", "created_at", "updated_at", "key", "value", "ca
 
 -- Table: nita.subscription_plans
 CREATE TABLE IF NOT EXISTS nita.subscription_plans (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -805,7 +807,7 @@ ALTER TABLE nita.subscription_plans ADD CONSTRAINT "subscription_plans_pkey" PRI
 
 -- Table: nita.subscriptions
 CREATE TABLE IF NOT EXISTS nita.subscriptions (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "patient_id" character varying,
@@ -828,7 +830,7 @@ ALTER TABLE nita.subscriptions ADD CONSTRAINT "subscriptions_pkey" PRIMARY KEY (
 
 -- Table: nita.testimonials
 CREATE TABLE IF NOT EXISTS nita.testimonials (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
@@ -846,7 +848,7 @@ ALTER TABLE nita.testimonials ADD CONSTRAINT "testimonials_pkey" PRIMARY KEY ("i
 
 -- Table: nita.vaccines
 CREATE TABLE IF NOT EXISTS nita.vaccines (
-  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "created_at" timestamp without time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp without time zone NOT NULL DEFAULT now(),
   "name" character varying NOT NULL,
