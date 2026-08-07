@@ -574,6 +574,14 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Safety-net: the brand loader always fades out 2.6s after mount, even if
+   JavaScript is broken or hydration fails. The JS path in BrandLoader.tsx
+   normally removes the node from the DOM earlier; this is a fallback only. */
+@keyframes brandLoaderAutoHide {
+  0%, 92% { opacity: 1; visibility: visible; }
+  100%    { opacity: 0; visibility: hidden; }
+}
+
 /* Utility classes for the artwork animations */
 .pulse-ring  { animation: pulseRing 3.4s cubic-bezier(0, 0, 0.2, 1) infinite; }
 .svg-scan    { animation: svgScan 3.4s ease-in-out infinite; transform-box: fill-box; }
@@ -590,6 +598,10 @@
 .animate-[brand-loader-spin_1.6s_linear_infinite] {
   animation: brandLoaderSpin 1.6s linear infinite;
   transform-origin: center;
+}
+
+.brand-loader-auto-hide {
+  animation: brandLoaderAutoHide 2.6s ease-out forwards;
 }
 
 /* React DatePicker custom styles */
