@@ -9,13 +9,25 @@ interface ChatMessage {
 
 @Injectable()
 export class ChatbotService {
-  private openai: OpenAI;
+  private openai: OpenAI | null = null;
   private systemPrompt: string;
+  private readonly apiKey: string | undefined;
 
   constructor(private configService: ConfigService) {
-    this.openai = new OpenAI({
-      apiKey: this.configService.get('OPENAI_API_KEY'),
-    });
+    this.apiKey = this.configService.get('OPENAI_API_KEY');
+    if (this.apiKey) {
+      try {
+        this.openai = new OpenAI({ apiKey: this.apiKey });
+      } catch (err) {
+        // Defensive: if OpenAI client construction fails for any reason, log and
+        // keep the service alive so the rest of the app can boot. The chat()
+        // method will surface a friendly "not configured" error to the caller.
+        console.warn('[chatbot] OpenAI client init failed; chatbot will be disabled:', err?.message || err);
+        this.openai = null;
+      }
+    } else {
+      console.warn('[chatbot] OPENAI_API_KEY not set; chatbot will be disabled until configured.');
+    }
 
     this.systemPrompt = `You are a helpful assistant for Nita Clinics. Your role is to help:
     
@@ -48,6 +60,9 @@ Working Hours:
     message: string,
     conversationHistory: ChatMessage[] = [],
   ): Promise<string> {
+    if (!this.openai) {
+      return "Our AI assistant is not configured right now. Please call us at 0145-92100 or use the booking form and our team will help you directly.";
+    }
     try {
       const messages: ChatMessage[] = [
         { role: 'system', content: this.systemPrompt },

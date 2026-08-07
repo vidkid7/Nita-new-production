@@ -83,6 +83,12 @@ import { RedisCacheModule } from './common/cache/redis-cache.module';
               max: Number(configService.get('DATABASE_POOL_MAX', 20)),
               idleTimeoutMillis: 30_000,
               connectionTimeoutMillis: 10_000,
+              // Force IPv4 resolution. Render's outbound network cannot reach
+              // IPv6 destinations, but Supabase's `db.<ref>.supabase.co`
+              // hostname advertises both A and AAAA records. Without this,
+              // node-postgres picks the IPv6 address first and gets
+              // ENETUNREACH on Render.
+              family: 4,
             },
           };
         }
