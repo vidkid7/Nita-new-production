@@ -166,3 +166,39 @@ export function SyringeDrawing({ className, stroke, soft }: ArtProps) {
     </svg>
   );
 }
+
+/** Pharmacy — capsule pill with a medical cross + floating sparkles */
+export function PillDrawing({ className, stroke, soft }: ArtProps) {
+  return (
+    <svg viewBox="0 0 200 200" fill="none" className={className} aria-hidden="true">
+      {/* capsule body (rotated) */}
+      <g transform="rotate(-30 100 100)">
+        {/* left half (light) */}
+        <path d="M44 84 a 16 16 0 0 1 16 -16 h48 v32 h-48 a 16 16 0 0 1 -16 -16 Z" stroke={stroke} strokeWidth="5" strokeLinejoin="round" fill={soft} fillOpacity="0.55" />
+        {/* right half (outline) */}
+        <path d="M108 68 h48 a 16 16 0 0 1 16 16 a 16 16 0 0 1 -16 16 h-48 Z" stroke={stroke} strokeWidth="5" strokeLinejoin="round" />
+        {/* divider highlight */}
+        <path d="M108 64 v36" stroke={stroke} strokeWidth="3" strokeLinecap="round" />
+        {/* shine */}
+        <path d="M58 80 q 4 -4 12 -4" stroke={stroke} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+        <path d="M124 80 q 4 -4 12 -4" stroke={stroke} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+      </g>
+      {/* medical cross on left half */}
+      <g transform="translate(82 96)">
+        <path d="M-3 -8 h6 v5 h5 v6 h-5 v5 h-6 v-5 h-5 v-6 h5 Z" fill={stroke} className="heart-beat" />
+      </g>
+      {/* floating mini pills */}
+      <g className="spark-float">
+        <rect x="30" y="50" width="22" height="10" rx="5" stroke={stroke} strokeWidth="3" transform="rotate(-20 41 55)" />
+      </g>
+      <g className="spark-float anim-delay-2">
+        <rect x="148" y="48" width="22" height="10" rx="5" stroke={stroke} strokeWidth="3" transform="rotate(20 159 53)" />
+      </g>
+      {/* sparkles */}
+      <path d="M30 130 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill={stroke} className="spark-float anim-delay-3" />
+      <path d="M170 132 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill={stroke} className="spark-float" />
+      <circle cx="166" cy="166" r="4" stroke={stroke} strokeWidth="3" className="spark-float anim-delay-2" />
+      <circle cx="36" cy="170" r="4" stroke={stroke} strokeWidth="3" className="spark-float anim-delay-3" />
+    </svg>
+  );
+}

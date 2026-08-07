@@ -185,9 +185,9 @@ async function main() {
     const { rows: fkDefs } = await client.query(`
       SELECT
         con.conname AS constraint_name,
-        ARRAY_AGG(att.attname ORDER BY array_position(con.conkey, att.attnum)) AS src_cols,
+        string_agg(att.attname, ',' ORDER BY array_position(con.conkey, att.attnum)) AS src_cols,
         confrel.relname AS dst_table,
-        ARRAY_AGG(att2.attname ORDER BY array_position(con.confkey, att2.attnum)) AS dst_cols,
+        string_agg(att2.attname, ',' ORDER BY array_position(con.confkey, att2.attnum)) AS dst_cols,
         confdeltype AS on_delete,
         confupdtype AS on_update
       FROM pg_constraint con
@@ -200,8 +200,10 @@ async function main() {
       GROUP BY con.conname, confrel.relname, confdeltype, confupdtype
     `, [SCHEMA, table]);
     for (const fk of fkDefs) {
-      const srcCols = String(fk.src_cols || '').split(',').filter(Boolean).map((c) => `"${c}"`).join(', ');
-      const dstCols = String(fk.dst_cols || '').split(',').filter(Boolean).map((c) => `"${c}"`).join(', ');
+      // pg node driver may return arrays as "{a,b}" or just strings; normalise
+      const norm = (v) => String(v ?? '').replace(/[{}]/g, '').replace(/^\"|\"$/g, '').trim();
+      const srcCols = norm(fk.src_cols).split(',').filter(Boolean).map((c) => `"${c.trim()}"`).join(', ');
+      const dstCols = norm(fk.dst_cols).split(',').filter(Boolean).map((c) => `"${c.trim()}"`).join(', ');
       const onDelete = fk.on_delete !== 'a' ? ` ON DELETE ${({ r: 'CASCADE', c: 'CASCADE', n: 'SET NULL', d: 'SET DEFAULT', a: 'NO ACTION' }[fk.on_delete] || 'NO ACTION')}` : '';
       out.push(`ALTER TABLE nita.${table} ADD CONSTRAINT "${fk.constraint_name}" FOREIGN KEY (${srcCols}) REFERENCES nita.${fk.dst_table} (${dstCols})${onDelete};`);
     }
@@ -226,8 +228,17 @@ async function main() {
 
   out.push('-- Done.');
 
-  fs.writeFileSync(OUT, out.join('\n'), 'utf8');
-  console.log(`✓ Wrote ${OUT} (${(fs.statSync(OUT).size / 1024).toFixed(1)} KB, ${out.length} lines)`);
+  // Supabase has pgcrypto preinstalled but not uuid-ossp; normalise DEFAULT to gen_random_uuid().
+  let finalSql = out.join('\n').replace(/uuid_generate_v4\(\)/g, 'gen_random_uuid()');
+  if (!finalSql.includes('CREATE EXTENSION IF NOT EXISTS "pgcrypto"')) {
+    finalSql = finalSql.replace(
+      'CREATE SCHEMA IF NOT EXISTS nita;',
+      'CREATE SCHEMA IF NOT EXISTS nita;\n\n-- Supabase has pgcrypto preinstalled; uuid-ossp is not enabled by default.\nCREATE EXTENSION IF NOT EXISTS "pgcrypto";',
+    );
+  }
+
+  fs.writeFileSync(OUT, finalSql, 'utf8');
+  console.log(`✓ Wrote ${OUT} (${(fs.statSync(OUT).size / 1024).toFixed(1)} KB, ${finalSql.split('\n').length} lines)`);
 
   await client.end();
 }

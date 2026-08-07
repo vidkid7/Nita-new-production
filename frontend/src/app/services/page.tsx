@@ -13,6 +13,7 @@ import {
   Award,
   Sparkles,
   CheckCircle2,
+  Pill,
 } from 'lucide-react';
 import { PremiumLandingHero } from '@/components/ui/PremiumLandingHero';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -115,6 +116,26 @@ const SERVICES: ServiceCard[] = [
     ring: 'ring-sky-200',
     iconBg: 'bg-sky-50 text-sky-600',
   },
+  {
+    slug: 'pharmacy',
+    href: '/services/pharmacy',
+    icon: <Pill className="h-7 w-7" />,
+    badge: 'NEW',
+    title: 'Pharmacy',
+    tagline: 'Counter pickup & home delivery',
+    description:
+      'Pick up your prescription at the Nita Clinics counter or get same-day home delivery within Kathmandu Valley. Pharmacist-reviewed, cold-chain safe, and priced transparently.',
+    highlights: [
+      'Walk-in counter in Bhimselgola-9',
+      'Same-day home delivery in valley',
+      'Cold-chain handling for insulin & vaccines',
+      'Free pharmacist call-back',
+    ],
+    startingPrice: 'From NPR 100',
+    gradient: 'from-amber-500 via-orange-500 to-rose-600',
+    ring: 'ring-amber-200',
+    iconBg: 'bg-amber-50 text-amber-600',
+  },
 ];
 
 const PROMISE = [
@@ -136,7 +157,7 @@ const PROMISE = [
   {
     icon: <Sparkles className="h-5 w-5" />,
     title: 'One trusted clinic',
-    copy: 'All four services under one roof with shared digital health records.',
+    copy: 'All five services under one roof with shared digital health records.',
   },
 ];
 
@@ -145,9 +166,9 @@ export default function ServicesPage() {
     <main>
       <PremiumLandingHero
         eyebrow="Our Services · Nita Clinics"
-        title="Four ways to care"
+        title="Five ways to care"
         highlight="for you and your family."
-        description="Pick the service that fits your day — walk into our lab, book a home visit, get a vaccine, or talk to a doctor online. Same standard of care, same team, same record."
+        description="Pick the service that fits your day — walk into our lab, pick up medicines, book a home visit, get a vaccine, or talk to a doctor online. Same standard of care, same team, same record."
         videoSrc="/videos/hero/lab-microscope.mp4"
         posterSrc="/videos/hero/lab-microscope.jpg"
         overlayClassName="from-primary-950/[0.88] via-primary-900/[0.66] to-teal-900/[0.42]"
@@ -156,13 +177,13 @@ export default function ServicesPage() {
           { label: 'Book Home Visit', href: '/services/home-visit', variant: 'secondary' },
         ]}
         trustPoints={[
-          '4 integrated services under one clinic',
+          '5 integrated services under one clinic',
           'Same-day lab reports and same-day consultations',
           'Transparent NRP pricing on every service',
           'Digital records shared across all touchpoints',
         ]}
         stats={[
-          { value: '4', label: 'Services' },
+          { value: '5', label: 'Services' },
           { value: '36+', label: 'Lab Tests' },
           { value: 'Same', label: 'Day Reports' },
         ]}

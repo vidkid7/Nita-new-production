@@ -8,6 +8,7 @@ import {
   LotusDrawing,
   HeartEcgDrawing,
   HealthCardDrawing,
+  PillDrawing,
 } from './ServiceArtworks';
 import { useSettings } from '@/hooks/useSettings';
 import { useHomePageContent } from '@/hooks/useHomePageContent';
@@ -26,6 +27,7 @@ const ART_MAP: Record<
   female: LotusDrawing,
   heartbeat: HeartEcgDrawing,
   creditCard: HealthCardDrawing,
+  pill: PillDrawing,
 };
 
 type ArtStyle = {

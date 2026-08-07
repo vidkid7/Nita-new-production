@@ -7,7 +7,8 @@ export type HomeServiceIconKey =
   | 'microscope'
   | 'female'
   | 'heartbeat'
-  | 'creditCard';
+  | 'creditCard'
+  | 'pill';
 
 export type HomeServiceColorKey = 'primary' | 'rose' | 'emerald' | 'sky' | 'amber' | 'indigo';
 
@@ -65,6 +66,14 @@ export const HOME_SERVICES_DEFAULT: HomeServicesBlock = {
       href: '/health-card',
       tag: 'Health Card',
     },
+    {
+      iconKey: 'pill',
+      colorKey: 'amber',
+      title: 'NITA Pharmacy',
+      desc: 'Walk-in counter and same-day home delivery within Kathmandu Valley. Pharmacist-reviewed, cold-chain safe, and priced transparently.',
+      href: '/services/pharmacy',
+      tag: 'Pharmacy',
+    },
   ],
 };
 
@@ -73,6 +82,7 @@ const ICON_KEYS: HomeServiceIconKey[] = [
   'female',
   'heartbeat',
   'creditCard',
+  'pill',
 ];
 const COLOR_KEYS: HomeServiceColorKey[] = ['primary', 'rose', 'emerald', 'sky', 'amber', 'indigo'];
 

@@ -1,15 +1,13 @@
 -- ============================================================
 -- Nita Clinics — nita schema seed for Supabase
--- Generated 2026-08-07T07:29:35.217Z
+-- Generated 2026-08-07T08:26:52.805Z
 -- Paste this entire file into Supabase SQL Editor and Run
 -- ============================================================
 
 CREATE SCHEMA IF NOT EXISTS nita;
 SET search_path TO nita, public;
 
--- Supabase has pgcrypto preinstalled (uuid-ossp is not enabled by default).
--- pgcrypto provides gen_random_uuid() which is API-compatible with uuid_generate_v4().
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TYPE nita.appointments_status_enum AS ENUM ('pending', 'confirmed', 'cancelled', 'completed', 'no_show');
 CREATE TYPE nita.checkup_packages_category_enum AS ENUM ('female_general', 'female_premium', 'male_general', 'male_premium', 'tuberculosis', 'pediatrics', 'gynecology');
@@ -108,8 +106,8 @@ CREATE TABLE IF NOT EXISTS nita.doctors (
 
 ALTER TABLE nita.doctors ADD CONSTRAINT "doctors_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE nita.doctors ADD CONSTRAINT "FK_3672b55bcb332e54bc8d8cda1c1" FOREIGN KEY ("{department_id}") REFERENCES nita.departments ("{id}");
-ALTER TABLE nita.doctors ADD CONSTRAINT "FK_653c27d1b10652eb0c7bbbc4427" FOREIGN KEY ("{user_id}") REFERENCES nita.users ("{id}");
+ALTER TABLE nita.doctors ADD CONSTRAINT "FK_3672b55bcb332e54bc8d8cda1c1" FOREIGN KEY ("department_id") REFERENCES nita.departments ("id");
+ALTER TABLE nita.doctors ADD CONSTRAINT "FK_653c27d1b10652eb0c7bbbc4427" FOREIGN KEY ("user_id") REFERENCES nita.users ("id");
 
 -- Data for nita.doctors (8 rows)
 INSERT INTO nita.doctors ("id", "created_at", "updated_at", "user_id", "name", "email", "phone", "photo", "qualification", "specialization", "staff_type", "department_id", "experience", "consultation_fee", "bio", "is_active") VALUES ('17b9e0bb-5f79-4e78-96c6-713de1299f82', '2026-08-05T06:52:28.935Z', '2026-08-05T06:52:28.935Z', NULL, 'Dr. Josie R. Baral', 'josie.baral@nitaclinics.com', '+977 01-4533361', NULL, 'MD, MS Gynecology', 'Gynecology & Obstetrics', 'doctor', '9fcdbed4-eb33-4cbe-8f17-89ef0cb2a366', 14, '800.00', 'Senior consultant in gynecology & obstetrics with 14+ years of experience in women''s health, prenatal monitoring, and reproductive care.', true);
@@ -142,7 +140,7 @@ CREATE TABLE IF NOT EXISTS nita.appointments (
 
 ALTER TABLE nita.appointments ADD CONSTRAINT "appointments_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE nita.appointments ADD CONSTRAINT "FK_4cf26c3f972d014df5c68d503d2" FOREIGN KEY ("{doctor_id}") REFERENCES nita.doctors ("{id}");
+ALTER TABLE nita.appointments ADD CONSTRAINT "FK_4cf26c3f972d014df5c68d503d2" FOREIGN KEY ("doctor_id") REFERENCES nita.doctors ("id");
 
 -- Data for nita.appointments (1 rows)
 INSERT INTO nita.appointments ("id", "created_at", "updated_at", "doctor_id", "patient_name", "patient_email", "patient_phone", "date", "start_time", "end_time", "status", "notes", "cancellation_reason", "reminder_sent", "confirmation_sent") VALUES ('0a49a32d-b2d9-4fac-a55f-582e732b1c0c', '2026-08-05T06:55:08.729Z', '2026-08-05T06:55:26.362Z', 'bc68cd0b-eeaa-459d-8b92-5a9d9f4fff6b', 'Audit Patient 717934', 'audit-717934@nita-test.com', '+97798717934', '2026-08-10T18:15:00.000Z', '10:00:00', '10:15:00', 'confirmed', 'Visit: consultation
@@ -171,7 +169,7 @@ CREATE TABLE IF NOT EXISTS nita.blog_posts (
 ALTER TABLE nita.blog_posts ADD CONSTRAINT "blog_posts_pkey" PRIMARY KEY ("id");
 CREATE UNIQUE INDEX IF NOT EXISTS "UQ_5b2818a2c45c3edb9991b1c7a51" ON nita.blog_posts ("slug");
 
-ALTER TABLE nita.blog_posts ADD CONSTRAINT "FK_c3fc4a3a656aad74331acfcf2a9" FOREIGN KEY ("{author_id}") REFERENCES nita.users ("{id}");
+ALTER TABLE nita.blog_posts ADD CONSTRAINT "FK_c3fc4a3a656aad74331acfcf2a9" FOREIGN KEY ("author_id") REFERENCES nita.users ("id");
 
 -- (no rows for nita.blog_posts)
 
@@ -252,7 +250,7 @@ CREATE TABLE IF NOT EXISTS nita.doctor_availabilities (
 
 ALTER TABLE nita.doctor_availabilities ADD CONSTRAINT "doctor_availabilities_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE nita.doctor_availabilities ADD CONSTRAINT "FK_aa49ce7b9ff575a2963abcb6910" FOREIGN KEY ("{doctor_id}") REFERENCES nita.doctors ("{id}") ON DELETE CASCADE;
+ALTER TABLE nita.doctor_availabilities ADD CONSTRAINT "FK_aa49ce7b9ff575a2963abcb6910" FOREIGN KEY ("doctor_id") REFERENCES nita.doctors ("id") ON DELETE CASCADE;
 
 -- Data for nita.doctor_availabilities (48 rows)
 INSERT INTO nita.doctor_availabilities ("id", "created_at", "updated_at", "doctor_id", "day_of_week", "start_time", "end_time", "slot_duration", "is_active") VALUES ('11d46c4a-fb19-4ab4-bc63-9dcb16f37179', '2026-08-05T06:54:54.577Z', '2026-08-05T06:54:54.577Z', '17b9e0bb-5f79-4e78-96c6-713de1299f82', 1, '09:00:00', '17:00:00', 15, true);
@@ -317,7 +315,7 @@ CREATE TABLE IF NOT EXISTS nita.doctor_leaves (
 
 ALTER TABLE nita.doctor_leaves ADD CONSTRAINT "doctor_leaves_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE nita.doctor_leaves ADD CONSTRAINT "FK_d9896f0becfc0dba8b724c5459b" FOREIGN KEY ("{doctor_id}") REFERENCES nita.doctors ("{id}") ON DELETE CASCADE;
+ALTER TABLE nita.doctor_leaves ADD CONSTRAINT "FK_d9896f0becfc0dba8b724c5459b" FOREIGN KEY ("doctor_id") REFERENCES nita.doctors ("id") ON DELETE CASCADE;
 
 -- (no rows for nita.doctor_leaves)
 
@@ -340,7 +338,7 @@ CREATE TABLE IF NOT EXISTS nita.enquiries (
 
 ALTER TABLE nita.enquiries ADD CONSTRAINT "enquiries_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE nita.enquiries ADD CONSTRAINT "FK_7cd8ff13ddd8446af7dd4eb5da1" FOREIGN KEY ("{assigned_to}") REFERENCES nita.users ("{id}");
+ALTER TABLE nita.enquiries ADD CONSTRAINT "FK_7cd8ff13ddd8446af7dd4eb5da1" FOREIGN KEY ("assigned_to") REFERENCES nita.users ("id");
 
 -- Data for nita.enquiries (9 rows)
 INSERT INTO nita.enquiries ("id", "created_at", "updated_at", "type", "name", "email", "phone", "subject", "message", "status", "assigned_to", "response", "responded_at") VALUES ('ebf621bb-3484-40c7-bbe7-65c9a75e849b', '2026-08-04T18:40:51.217Z', '2026-08-04T18:40:51.217Z', 'services', 'Test Patient', 'home-visit-test@example.com', '9841234567', 'Home visit booking — Doctor home visit', 'Service: Doctor home visit
@@ -454,7 +452,7 @@ ALTER TABLE nita.patients ADD CONSTRAINT "patients_pkey" PRIMARY KEY ("id");
 CREATE UNIQUE INDEX IF NOT EXISTS "REL_7fe1518dc780fd777669b5cb7a" ON nita.patients ("user_id");
 CREATE UNIQUE INDEX IF NOT EXISTS "UQ_64e2031265399f5690b0beba6a5" ON nita.patients ("email");
 
-ALTER TABLE nita.patients ADD CONSTRAINT "FK_7fe1518dc780fd777669b5cb7a0" FOREIGN KEY ("{user_id}") REFERENCES nita.users ("{id}") ON DELETE SET NULL;
+ALTER TABLE nita.patients ADD CONSTRAINT "FK_7fe1518dc780fd777669b5cb7a0" FOREIGN KEY ("user_id") REFERENCES nita.users ("id") ON DELETE SET NULL;
 
 -- Data for nita.patients (6 rows)
 INSERT INTO nita.patients ("id", "created_at", "updated_at", "user_id", "full_name", "email", "phone", "date_of_birth", "gender", "blood_group", "address", "city", "emergency_contact_name", "emergency_contact_phone", "medical_history", "allergies", "is_active") VALUES ('0999d58a-babc-41e8-8e55-75ac78eb2063', '2026-08-04T21:17:54.095Z', '2026-08-04T21:17:54.095Z', 'ca2dea8f-477a-4411-89b3-37acd1691188', 'Smoke Test', 'smoke.p3@example.com', '+9779812345678', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true);
@@ -488,7 +486,7 @@ CREATE TABLE IF NOT EXISTS nita.lab_orders (
 ALTER TABLE nita.lab_orders ADD CONSTRAINT "lab_orders_pkey" PRIMARY KEY ("id");
 CREATE UNIQUE INDEX IF NOT EXISTS "UQ_54636afb374c8f12628f4f719f7" ON nita.lab_orders ("order_number");
 
-ALTER TABLE nita.lab_orders ADD CONSTRAINT "FK_b2d20a4e73dd2b139e08db51e8f" FOREIGN KEY ("{patient_id}") REFERENCES nita.patients ("{id}") ON DELETE SET NULL;
+ALTER TABLE nita.lab_orders ADD CONSTRAINT "FK_b2d20a4e73dd2b139e08db51e8f" FOREIGN KEY ("patient_id") REFERENCES nita.patients ("id") ON DELETE SET NULL;
 
 -- (no rows for nita.lab_orders)
 
@@ -518,7 +516,7 @@ CREATE TABLE IF NOT EXISTS nita.home_collections (
 ALTER TABLE nita.home_collections ADD CONSTRAINT "home_collections_pkey" PRIMARY KEY ("id");
 CREATE UNIQUE INDEX IF NOT EXISTS "REL_8f7dc3b124e7decb81baf7704a" ON nita.home_collections ("order_id");
 
-ALTER TABLE nita.home_collections ADD CONSTRAINT "FK_8f7dc3b124e7decb81baf7704a9" FOREIGN KEY ("{order_id}") REFERENCES nita.lab_orders ("{id}") ON DELETE SET NULL;
+ALTER TABLE nita.home_collections ADD CONSTRAINT "FK_8f7dc3b124e7decb81baf7704a9" FOREIGN KEY ("order_id") REFERENCES nita.lab_orders ("id") ON DELETE SET NULL;
 
 -- Data for nita.home_collections (3 rows)
 INSERT INTO nita.home_collections ("id", "created_at", "updated_at", "order_id", "patient_name", "patient_phone", "patient_email", "address", "city", "landmark", "preferred_date", "preferred_time_slot", "assigned_staff_id", "assigned_staff_name", "status", "collection_notes", "service_charge", "currency", "completed_at") VALUES ('81574ce3-ebfc-4355-837d-fa7a422445e5', '2026-08-04T21:18:19.365Z', '2026-08-04T21:18:19.365Z', NULL, 'Smoke Home', '+9779812345678', NULL, 'Smoke Test Address', NULL, NULL, '2026-08-09T18:15:00.000Z', '10:00-12:00', NULL, NULL, 'requested', NULL, '0.00', 'NPR', NULL);
@@ -540,7 +538,7 @@ CREATE TABLE IF NOT EXISTS nita.lab_order_items (
 
 ALTER TABLE nita.lab_order_items ADD CONSTRAINT "lab_order_items_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE nita.lab_order_items ADD CONSTRAINT "FK_9ec251f9ba811b2e24bb0c41a7e" FOREIGN KEY ("{order_id}") REFERENCES nita.lab_orders ("{id}") ON DELETE CASCADE;
+ALTER TABLE nita.lab_order_items ADD CONSTRAINT "FK_9ec251f9ba811b2e24bb0c41a7e" FOREIGN KEY ("order_id") REFERENCES nita.lab_orders ("id") ON DELETE CASCADE;
 
 -- (no rows for nita.lab_order_items)
 
@@ -564,7 +562,7 @@ CREATE TABLE IF NOT EXISTS nita.lab_reports (
 
 ALTER TABLE nita.lab_reports ADD CONSTRAINT "lab_reports_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE nita.lab_reports ADD CONSTRAINT "FK_abcc2ecb1b4c68ae0eebde502e5" FOREIGN KEY ("{patient_id}") REFERENCES nita.patients ("{id}") ON DELETE CASCADE;
+ALTER TABLE nita.lab_reports ADD CONSTRAINT "FK_abcc2ecb1b4c68ae0eebde502e5" FOREIGN KEY ("patient_id") REFERENCES nita.patients ("id") ON DELETE CASCADE;
 
 -- (no rows for nita.lab_reports)
 
@@ -619,7 +617,7 @@ CREATE TABLE IF NOT EXISTS nita.lab_tests (
 ALTER TABLE nita.lab_tests ADD CONSTRAINT "lab_tests_pkey" PRIMARY KEY ("id");
 CREATE UNIQUE INDEX IF NOT EXISTS "UQ_655f50c82542f7a3792d4cabc52" ON nita.lab_tests ("slug");
 
-ALTER TABLE nita.lab_tests ADD CONSTRAINT "FK_662fe6bddb4bf7133a3117bbe1c" FOREIGN KEY ("{category_id}") REFERENCES nita.lab_test_categories ("{id}") ON DELETE CASCADE;
+ALTER TABLE nita.lab_tests ADD CONSTRAINT "FK_662fe6bddb4bf7133a3117bbe1c" FOREIGN KEY ("category_id") REFERENCES nita.lab_test_categories ("id") ON DELETE CASCADE;
 
 -- Data for nita.lab_tests (35 rows)
 INSERT INTO nita.lab_tests ("id", "created_at", "updated_at", "name", "slug", "category_id", "description", "long_description", "price", "original_price", "image", "turnaround", "sample_type", "preparation", "is_popular", "is_active", "tags", "includes", "order") VALUES ('45e93e76-a042-4749-93cd-789f0c63e98e', '2026-08-04T18:18:33.287Z', '2026-08-04T18:18:33.287Z', 'CT', 'ct', '373c1c81-ef96-42e9-988f-04c0a7fa92c3', 'Clotting time — coagulation screen.', 'Measures the time it takes for blood to clot, screening coagulation disorders.', '100.00', '150.00', NULL, 'Same day', 'Blood', 'No fasting required', false, true, '[]', '[]', 8);
@@ -765,7 +763,7 @@ CREATE TABLE IF NOT EXISTS nita.services (
 ALTER TABLE nita.services ADD CONSTRAINT "services_pkey" PRIMARY KEY ("id");
 CREATE UNIQUE INDEX IF NOT EXISTS "UQ_02cf0d0f46e11d22d952f623670" ON nita.services ("slug");
 
-ALTER TABLE nita.services ADD CONSTRAINT "FK_fe8dcab94e4095af071399c6523" FOREIGN KEY ("{department_id}") REFERENCES nita.departments ("{id}");
+ALTER TABLE nita.services ADD CONSTRAINT "FK_fe8dcab94e4095af071399c6523" FOREIGN KEY ("department_id") REFERENCES nita.departments ("id");
 
 -- (no rows for nita.services)
 

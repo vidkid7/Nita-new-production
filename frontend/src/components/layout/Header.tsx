@@ -37,6 +37,7 @@ const navigation: NavigationItem[] = [
     href: '/services',
     children: [
       { name: 'Laboratory', href: '/services/laboratory' },
+      { name: 'Pharmacy', href: '/services/pharmacy' },
       { name: 'Vaccination', href: '/services/vaccination' },
       { name: 'Home Visit', href: '/services/home-visit' },
       { name: 'Online Consultation', href: '/services/online-consultation' },
