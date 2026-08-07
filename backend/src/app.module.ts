@@ -117,22 +117,37 @@ import { RedisCacheModule } from './common/cache/redis-cache.module';
     // Task scheduling
     ScheduleModule.forRoot(),
 
-    // Queue (Bull) — use REDIS_URL on Railway; fallback to host/port locally
+    // Queue (Bull) — use REDIS_URL on Railway; fallback to host/port locally.
+    // lazyConnect + bounded retryStrategy so the app boots even when Redis is
+    // unreachable (e.g. Render free tier without Redis). Producers in
+    // enquiries.service.ts use @Optional() so missing Redis is non-fatal.
+    // NOTE: keep enableOfflineQueue: true (default) so Bull's worker setup
+    // command is queued while ioredis attempts to connect, instead of throwing
+    // 'Stream isn't writeable' on first call.
     BullModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const url = configService.get<string>('REDIS_URL')?.trim();
-        if (url) {
-          return { redis: url };
-        }
-        return {
-          redis: {
+        const clientOpts = {
+          lazyConnect: true,
+          maxRetriesPerRequest: null,
+          enableReadyCheck: false,
+          retryStrategy: (times: number) =>
+            times > 10 ? null : Math.min(times * 200, 2000),
+        };
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Redis = require('ioredis');
+        const createClient = () => {
+          if (url) return new Redis(url, clientOpts);
+          return new Redis({
             host: configService.get('REDIS_HOST', 'localhost'),
             port: Number(configService.get('REDIS_PORT', 6379)),
-          },
+            ...clientOpts,
+          });
         };
+        return { createClient } as any;
       },
-      inject: [ConfigService],
     }),
 
     RedisCacheModule,
