@@ -7,6 +7,7 @@
 #
 #   DATABASE_URL        — Supabase Postgres pooled connection string
 #                         (Project Settings → Database → Connection string → Transaction pooler)
+#                         MUST point to the same DB that holds the `nita` schema (see DATABASE_SCHEMA below)
 #   REDIS_URL           — Upstash Redis URL (rediss://default:<pwd>@<host>.upstash.io:6379)
 #   JWT_SECRET          — any 32+ char random string; same value used by the auth module
 #   FRONTEND_URL        — your Vercel frontend URL once it's deployed
@@ -42,7 +43,9 @@ services:
       - key: THROTTLE_LIMIT
         value: 100
       - key: DATABASE_SCHEMA
-        value: public
+        value: nita
+      - key: DATABASE_SYNCHRONIZE
+        value: "false"  # we manage schema via migrations / seed, not auto-sync
       - key: DATABASE_URL
         sync: false   # set this in the dashboard after Apply
       - key: REDIS_URL

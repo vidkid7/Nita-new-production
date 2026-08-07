@@ -18,6 +18,7 @@ import { addToCart } from '@/lib/cart';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { FALLBACK_LAB_TESTS } from '@/lib/diagnostic-data-fallback';
 
 function getSampleIcon(sampleType: string) {
   if (sampleType.toLowerCase().includes('blood')) return <Droplets className="w-4 h-4" />;
@@ -35,12 +36,26 @@ export default function TestDetailPage() {
     let cancelled = false;
     async function fetchTest() {
       setIsLoading(true);
+      // Helper: pull from the static fallback by slug or id
+      const fromFallback = (): DiagnosticTest | null => {
+        const needle = String(id || '').toLowerCase();
+        return (
+          FALLBACK_LAB_TESTS.find(
+            (t) => (t.slug && t.slug.toLowerCase() === needle) || t.id === id,
+          ) || null
+        );
+      };
+
       try {
         let data: Record<string, unknown> | null = null;
         try {
           data = await get<Record<string, unknown>>(`lab-tests/slug/${id}`);
         } catch {
-          data = await get<Record<string, unknown>>(`lab-tests/${id}`);
+          try {
+            data = await get<Record<string, unknown>>(`lab-tests/${id}`);
+          } catch {
+            /* backend down — will use fallback below */
+          }
         }
         if (!cancelled && data) {
           const mapped = mapLabTestFromApi(data);
@@ -61,16 +76,37 @@ export default function TestDetailPage() {
                 );
               }
             } catch {
-              if (!cancelled) setRelatedTests([]);
+              if (!cancelled) {
+                // Use the static fallback as a source for related tests
+                setRelatedTests(
+                  FALLBACK_LAB_TESTS.filter(
+                    (t) => t.categorySlug === mapped.categorySlug && t.id !== mapped.id,
+                  ).slice(0, 4),
+                );
+              }
             }
           } else {
             setRelatedTests([]);
           }
         } else if (!cancelled) {
-          setTest(null);
+          // Backend unreachable — try the static fallback
+          const fallback = fromFallback();
+          if (fallback) {
+            setTest(fallback);
+            setRelatedTests(
+              FALLBACK_LAB_TESTS.filter(
+                (t) => t.categorySlug === fallback.categorySlug && t.id !== fallback.id,
+              ).slice(0, 4),
+            );
+          } else {
+            setTest(null);
+          }
         }
       } catch {
-        if (!cancelled) setTest(null);
+        if (!cancelled) {
+          const fallback = fromFallback();
+          setTest(fallback);
+        }
       } finally {
         if (!cancelled) setIsLoading(false);
       }

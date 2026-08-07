@@ -61,13 +61,21 @@ import { RedisCacheModule } from './common/cache/redis-cache.module';
         const databaseUrl = configService.get('DATABASE_URL');
         
         if (databaseUrl) {
-          // Parse DATABASE_URL for Railway
+          // Parse DATABASE_URL for Railway/Render/Supabase
+          const isDev = configService.get('NODE_ENV') === 'development';
           return {
             type: 'postgres',
             url: databaseUrl,
+            // schema MUST be passed even when using DATABASE_URL, otherwise TypeORM
+            // silently falls back to `public` and queries the wrong tables.
+            schema: configService.get('DATABASE_SCHEMA', 'nita'),
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: configService.get('NODE_ENV') === 'development',
-            logging: configService.get('NODE_ENV') === 'development',
+            // Honor explicit flag; otherwise default: dev on, prod off.
+            synchronize:
+              configService.get('DATABASE_SYNCHRONIZE') !== undefined
+                ? configService.get('DATABASE_SYNCHRONIZE') === 'true' || configService.get('DATABASE_SYNCHRONIZE') === true
+                : isDev,
+            logging: isDev,
             ssl: {
               rejectUnauthorized: false,
             },

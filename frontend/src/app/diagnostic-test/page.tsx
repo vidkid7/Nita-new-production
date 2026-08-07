@@ -14,6 +14,10 @@ import {
   type DiagnosticCategory,
   type DiagnosticTest,
 } from '@/lib/diagnostic-data';
+import {
+  FALLBACK_LAB_CATEGORIES,
+  FALLBACK_LAB_TESTS,
+} from '@/lib/diagnostic-data-fallback';
 
 // Compact, low-key hero for the redesigned lab page (less visual noise than the
 // "premium landing hero" pattern used elsewhere).
@@ -155,6 +159,11 @@ export default function DiagnosticTestPage() {
     let cancelled = false;
     async function fetchData() {
       setLoadError(null);
+      // Always seed with the static fallback so the page renders even before
+      // the Render backend is up. If the API responds, its data overrides the
+      // fallback; otherwise we just keep what we have.
+      setTests(FALLBACK_LAB_TESTS);
+      setCategories(FALLBACK_LAB_CATEGORIES);
       try {
         const [testsRes, catsRes] = await Promise.all([
           get<any>('lab-tests?limit=100&sortBy=order&sortOrder=asc'),
@@ -162,7 +171,9 @@ export default function DiagnosticTestPage() {
         ]);
         if (cancelled) return;
         const rows = testsRes?.data ?? [];
-        setTests(rows.map((t: Record<string, unknown>) => mapLabTestFromApi(t)));
+        if (Array.isArray(rows) && rows.length > 0) {
+          setTests(rows.map((t: Record<string, unknown>) => mapLabTestFromApi(t)));
+        }
         if (Array.isArray(catsRes) && catsRes.length > 0) {
           setCategories(
             catsRes.map((c: Record<string, unknown>) => ({
@@ -176,8 +187,9 @@ export default function DiagnosticTestPage() {
         }
       } catch (e) {
         if (!cancelled) {
-          setLoadError('Unable to load lab tests. Please try again later.');
-          setTests([]);
+          // Keep fallback data so the page is not empty. The user can still
+          // browse the catalog while the backend is down.
+          setLoadError(null);
         }
       } finally {
         if (!cancelled) setIsLoading(false);

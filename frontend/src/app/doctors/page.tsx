@@ -10,6 +10,7 @@ import { CTAFooter } from '@/components/ui/CTAFooter';
 import { DoctorDetailModal, type DoctorDetailData } from '@/components/specialists/DoctorDetailModal';
 import { get, PaginatedResponse } from '@/lib/api';
 import { toast } from 'react-hot-toast';
+import { FALLBACK_DOCTORS } from '@/lib/static-content-fallback';
 
 interface Doctor {
   id: string;
@@ -22,6 +23,21 @@ interface Doctor {
   isActive: boolean;
   email: string;
   phone: string;
+}
+
+function fallbackToLocalDoctors(): Doctor[] {
+  return FALLBACK_DOCTORS.map((d) => ({
+    id: d.id,
+    name: d.name,
+    specialization: d.specialization,
+    qualification: d.qualification,
+    experience: d.experience,
+    bio: d.bio || '',
+    photo: d.photo || undefined,
+    isActive: d.isActive,
+    email: d.email,
+    phone: d.phone,
+  }));
 }
 
 const specializations = [
@@ -44,20 +60,25 @@ export default function DoctorsPage() {
   // Fetch doctors from API
   useEffect(() => {
     const fetchDoctors = async () => {
+      // Always seed with the static fallback so the page is never empty
+      // while the Render backend is being provisioned.
+      setDoctors(fallbackToLocalDoctors());
       try {
         setLoading(true);
         const response = await get<PaginatedResponse<Doctor>>('doctors', {
-          params: { 
-            page: 1, 
-            limit: 100, 
-            sortBy: 'name', 
+          params: {
+            page: 1,
+            limit: 100,
+            sortBy: 'name',
             sortOrder: 'asc'
           },
         });
-        setDoctors(response.data || []);
+        if (response.data && response.data.length > 0) {
+          setDoctors(response.data);
+        }
       } catch (error) {
-        console.error('Failed to load doctors', error);
-        toast.error('Failed to load doctors');
+        console.warn('Failed to load doctors from API, using fallback', error);
+        // Keep fallback
       } finally {
         setLoading(false);
       }

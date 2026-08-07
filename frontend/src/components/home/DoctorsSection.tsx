@@ -7,6 +7,7 @@ import { FiArrowRight, FiCalendar, FiCheck } from 'react-icons/fi';
 import { FlowerDrawing, BabyDrawing, LungsDrawing, OrthoDrawing } from './SpecialistArtworks';
 import { get } from '@/lib/api';
 import type { PaginatedResponse } from '@/lib/api';
+import { FALLBACK_DOCTORS } from '@/lib/static-content-fallback';
 
 const specialists = [
   {
@@ -107,6 +108,17 @@ export function DoctorsSection() {
 
   useEffect(() => {
     let cancelled = false;
+    // Always seed with the static fallback so the section renders even
+    // before the backend is up. The API will override if it responds.
+    setPreviewDoctors(
+      FALLBACK_DOCTORS.slice(0, 4).map((d) => ({
+        id: String(d.id),
+        name: String(d.name || ''),
+        specialization: String(d.specialization || ''),
+        qualification: d.qualification ? String(d.qualification) : undefined,
+        photo: d.photo ? String(d.photo) : undefined,
+      })),
+    );
     (async () => {
       try {
         const res = await get<PaginatedResponse<Record<string, unknown>>>('doctors', {
@@ -121,9 +133,9 @@ export function DoctorsSection() {
             qualification: d.qualification != null ? String(d.qualification) : undefined,
             photo: d.photo != null ? String(d.photo) : undefined,
           }));
-        if (!cancelled) setPreviewDoctors(rows);
+        if (!cancelled && rows.length > 0) setPreviewDoctors(rows);
       } catch {
-        if (!cancelled) setPreviewDoctors([]);
+        /* keep fallback */
       } finally {
         if (!cancelled) setPreviewLoaded(true);
       }

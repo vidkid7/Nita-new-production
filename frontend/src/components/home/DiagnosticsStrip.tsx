@@ -13,6 +13,7 @@ import {
   testImageOrPlaceholder,
   type DiagnosticTest,
 } from '@/lib/diagnostic-data';
+import { FALLBACK_LAB_TESTS } from '@/lib/diagnostic-data-fallback';
 
 const TAG_COLORS = [
   'bg-rose-100 text-rose-700',
@@ -32,6 +33,30 @@ export function DiagnosticsStrip() {
 
   useEffect(() => {
     let cancelled = false;
+    // Seed with static fallback so the strip always shows something.
+    // Prefer popular, then any tests; cap at 4.
+    const seed = FALLBACK_LAB_TESTS.filter((t) => t.isPopular).slice(0, 4);
+    const seedRows = (seed.length >= 4 ? seed : FALLBACK_LAB_TESTS.slice(0, 4)).map((t) => ({
+      id: t.id,
+      name: t.name,
+      description: t.description,
+      longDescription: t.longDescription,
+      price: t.price,
+      originalPrice: t.originalPrice,
+      image: t.image,
+      turnaround: t.turnaround,
+      sampleType: t.sampleType,
+      isPopular: t.isPopular,
+      tags: t.tags,
+      includes: t.includes,
+      category: t.category,
+      categorySlug: t.categorySlug,
+      categoryId: t.categoryId,
+      slug: t.slug,
+    }));
+    setTests(seedRows.map((t) => mapLabTestFromApi(t)));
+    setCatalogTotal(FALLBACK_LAB_TESTS.length);
+
     (async () => {
       try {
         const [countResult, popularResult] = await Promise.allSettled([
@@ -72,11 +97,11 @@ export function DiagnosticsStrip() {
             rows = [];
           }
         }
-        if (!cancelled) {
+        if (!cancelled && rows.length > 0) {
           setTests(rows.map((t) => mapLabTestFromApi(t)));
         }
       } catch {
-        if (!cancelled) setTests([]);
+        /* keep fallback */
       } finally {
         if (!cancelled) setLoaded(true);
       }
