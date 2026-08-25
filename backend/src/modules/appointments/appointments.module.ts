@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BullModule } from '@nestjs/bull';
 import { AppointmentsService } from './appointments.service';
 import { AppointmentsController } from './appointments.controller';
 import { Appointment } from './entities/appointment.entity';
@@ -10,7 +9,6 @@ import { NotificationsModule } from '../notifications/notifications.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Appointment]),
-    BullModule.registerQueue({ name: 'notifications' }),
     DoctorsModule,
     NotificationsModule,
   ],
