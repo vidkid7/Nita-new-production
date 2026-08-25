@@ -43,8 +43,22 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        // HTML page responses — never cache aggressively so deploys show up immediately.
+        // Listed first so it wins over any framework-injected defaults.
+        source: '/:path*',
         headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
+          },
           {
             key: 'X-Frame-Options',
             value: 'DENY',
@@ -56,6 +70,16 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+      {
+        // Hashed static assets — safe to cache forever.
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

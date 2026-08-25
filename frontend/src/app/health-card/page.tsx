@@ -25,9 +25,6 @@ import {
   Info,
   Sparkles,
   Tag,
-  Crown,
-  Heart,
-  Building2,
   BadgeCheck,
   X as XIcon,
   ChevronDown,
@@ -37,13 +34,15 @@ import { ApplicationForm } from '@/components/health-card/ApplicationForm';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { HealthCard } from '@/components/health-card/HealthCard';
 
 /* ═════════════════════════════════════════════
-   AD-CARD COMPONENT  (poster / promotional look)
+   MEMBERSHIP CARD COMPONENT
 ═════════════════════════════════════════════ */
 
 interface AdCardData {
   id: string;
+  type: string;
   title: string;
   /** Short headline shown in giant text on the card */
   headline: string;
@@ -74,16 +73,8 @@ interface AdCardData {
   tierIcon: 'crown' | 'heart' | 'building' | 'badge';
 }
 
-const TIER_ICONS = {
-  crown: Crown,
-  heart: Heart,
-  building: Building2,
-  badge: BadgeCheck,
-};
-
 function AdCard({ data, isSelected, onSelect }: { data: AdCardData; isSelected: boolean; onSelect: () => void }) {
   const [hovered, setHovered] = useState(false);
-  const TierIcon = TIER_ICONS[data.tierIcon] ?? BadgeCheck;
 
   return (
     <motion.button
@@ -101,131 +92,41 @@ function AdCard({ data, isSelected, onSelect }: { data: AdCardData; isSelected: 
         }}
         transition={{ type: 'spring', stiffness: 280, damping: 22 }}
         className={cn(
-          'relative w-full h-full overflow-hidden rounded-3xl border-2 transition-all duration-300',
+          'relative w-full overflow-hidden rounded-2xl border bg-white p-4 text-neutral-900 transition-all duration-300 sm:p-5',
           isSelected
-            ? 'border-amber-400 shadow-[0_30px_70px_-20px_rgba(245,158,11,0.55)]'
-            : 'border-transparent shadow-[0_18px_50px_-22px_rgba(0,0,0,0.45)] hover:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)]',
+            ? 'border-amber-400 shadow-[0_24px_55px_-24px_rgba(245,158,11,0.55)] ring-2 ring-amber-200'
+            : 'border-neutral-200 shadow-[0_18px_50px_-22px_rgba(0,0,0,0.3)] hover:border-primary-200 hover:shadow-[0_24px_60px_-20px_rgba(1,173,165,0.25)]',
         )}
       >
-        {/* ── Background (gradient + optional image) ── */}
-        {data.imageUrl ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={data.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-            <div className={cn('absolute inset-0', data.gradient)} style={{ opacity: 0.92 }} />
-          </>
-        ) : (
-          <div className={cn('absolute inset-0', data.gradient)} />
-        )}
-
-        {/* Decorative orbs */}
-        <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-
-        {/* Diagonal stripes pattern for ad feel */}
-        <div
-          className="absolute inset-0 opacity-[0.06] pointer-events-none"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(135deg, transparent, transparent 12px, white 12px, white 13px)',
-          }}
-        />
-
-        {/* Ribbon — Top */}
-        <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 py-2.5 z-10">
-          <span
-            className={cn(
-              'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest shadow-md',
-              data.badgeColor,
-            )}
-          >
-            {data.isPopular && <Sparkles className="h-3 w-3" />}
-            {data.badge}
+        <div className="relative flex items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-teal-500 text-white shadow-sm">
+            <span className="text-sm font-black" aria-hidden="true">N</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-500">{data.holderLabel}</p>
+            <h3 className="mt-1 font-heading text-base font-extrabold leading-tight text-neutral-900 sm:text-lg">{data.title}</h3>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-600">{data.sub}</p>
+          </div>
+          <span className={cn('shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide', isSelected ? 'bg-amber-100 text-amber-900' : 'bg-primary-50 text-primary-800')}>
+            {isSelected ? 'Selected' : 'Choose'}
           </span>
-          {data.isPopular && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-300 text-amber-900 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest shadow-md">
-              <Star className="h-3 w-3 fill-current" /> Most Popular
-            </span>
-          )}
         </div>
-
-        {/* CONTENT */}
-        <div className="relative z-10 p-5 pt-14 flex flex-col gap-3 text-white min-h-[340px]">
-          {/* Tier icon + title */}
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-              <TierIcon className="h-5 w-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">
-                {data.holderLabel}
-              </p>
-              <h3 className="font-heading font-extrabold text-xl sm:text-2xl leading-tight mt-0.5">
-                {data.title}
-              </h3>
-              <p className="text-xs text-white/80 mt-0.5 line-clamp-2">{data.sub}</p>
-            </div>
+        <div className="relative mt-4 grid grid-cols-2 gap-2 border-t border-neutral-100 pt-3 text-left">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Member type</p>
+            <p className="mt-0.5 text-xs font-semibold text-neutral-900">{data.holderLabel}</p>
           </div>
-
-          {/* Big deal — main number */}
-          <div className="rounded-2xl bg-white/12 backdrop-blur-sm px-4 py-3 border border-white/15">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">
-              Headline Benefit
-            </p>
-            <p className="font-black text-3xl sm:text-4xl leading-none mt-1 drop-shadow">
-              {data.bigDeal}
-            </p>
-            <p className="text-xs text-white/85 mt-1 font-semibold">{data.smallDeal}</p>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Preview saving</p>
+            <p className="mt-0.5 text-xs font-semibold text-primary-800">{data.bigDeal}</p>
           </div>
-
-          {/* Mini benefit pills */}
-          <div className="flex flex-wrap gap-1.5">
-            {data.opdDiscount && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold border border-white/15">
-                <Stethoscope className="h-3 w-3" /> {data.opdDiscount} OPD
-              </span>
-            )}
-            {data.labDiscount && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold border border-white/15">
-                <FlaskConical className="h-3 w-3" /> {data.labDiscount} Labs
-              </span>
-            )}
-            {data.medicineDiscount && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold border border-white/15">
-                <Pill className="h-3 w-3" /> {data.medicineDiscount} Pharmacy
-              </span>
-            )}
-            {data.queueBenefit && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold border border-white/15">
-                <Zap className="h-3 w-3" /> {data.queueBenefit}
-              </span>
-            )}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Status</p>
+            <p className="mt-0.5 text-xs font-semibold text-emerald-700">Ready to apply</p>
           </div>
-
-          {/* Card meta + tap prompt */}
-          <div className="mt-auto pt-2 border-t border-white/15 flex items-end justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-mono text-[10px] tracking-[0.2em] text-white/55 truncate">
-                {data.cardNumber}
-              </p>
-              <p className="text-[9px] text-white/55 mt-0.5">Valid thru {data.validThru}</p>
-            </div>
-            <span
-              className={cn(
-                'inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider transition-colors',
-                isSelected ? 'text-amber-200' : 'text-white/90',
-              )}
-            >
-              {isSelected ? (
-                <>
-                  <Check className="h-3.5 w-3.5" strokeWidth={3} /> Selected
-                </>
-              ) : (
-                <>
-                  Select <ArrowRight className="h-3.5 w-3.5" />
-                </>
-              )}
-            </span>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Validity</p>
+            <p className="mt-0.5 text-xs font-semibold text-neutral-900">1 year after activation</p>
           </div>
         </div>
 
@@ -237,7 +138,7 @@ function AdCard({ data, isSelected, onSelect }: { data: AdCardData; isSelected: 
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 500, damping: 24 }}
-              className="absolute top-2 right-2 z-20 w-8 h-8 rounded-full bg-amber-300 shadow-xl flex items-center justify-center"
+              className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-amber-300 shadow-xl"
             >
               <Check className="w-5 h-5 text-amber-900" strokeWidth={3} />
             </motion.div>
@@ -276,7 +177,7 @@ const PARTNER_LOGOS = [
   {
     id: 'eng-nita',
     description: 'Engineering Nita Pvt. Ltd.',
-    image: 'https://engineeringnita.com/css/images/mainlogo.png',
+    image: '/images/nita-engineering-and-infra.jpeg',
     website: 'https://engineeringnita.com',
     className: 'max-h-12 w-auto max-w-[160px] object-contain opacity-75 hover:opacity-100 transition-opacity',
   },
@@ -336,9 +237,9 @@ const TYPE_STYLES: Record<string, Partial<AdCardData>> = {
     cardNumber: '•••• •••• •••• 3003',
     validThru: '12/26',
     sub: 'Staff of partner organizations (Nita Group companies)',
-    bigDeal: '100% OPD',
-    smallDeal: 'Same benefits as verified doctors',
-    discountSub: 'Free OPD + 50% Labs',
+    bigDeal: '50% OPD',
+    smallDeal: 'Half price on all doctor consultations',
+    discountSub: '50% OPD + 50% Labs',
     tagline: 'Corporate Partners',
     gradient: 'bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500',
     badge: '🏢 Corporate',
@@ -366,9 +267,9 @@ const TYPE_STYLES: Record<string, Partial<AdCardData>> = {
 function mapCategoryToCard(cat: Record<string, unknown>): AdCardData {
   const typeKey = String(cat.type || 'general_public');
   const s = TYPE_STYLES[typeKey] ?? TYPE_STYLES.general_public;
-  const img = cat.image != null ? String(cat.image).trim() : '';
   return {
     id: String(cat.id),
+    type: typeKey,
     title: String(cat.name || 'Card'),
     headline: s.headline ?? 'Health Card',
     sub: s.sub ?? '',
@@ -385,7 +286,6 @@ function mapCategoryToCard(cat: Record<string, unknown>): AdCardData {
     badgeColor: s.badgeColor ?? 'bg-white text-neutral-900',
     isPopular: s.isPopular,
     tierIcon: s.tierIcon ?? 'badge',
-    imageUrl: img || undefined,
     opdDiscount: cat.opdDiscount != null ? String(cat.opdDiscount) : '',
     labDiscount: cat.labDiscount != null ? String(cat.labDiscount) : '',
     medicineDiscount: cat.medicineDiscount != null ? String(cat.medicineDiscount) : '',
@@ -428,6 +328,15 @@ export default function HealthCardPage() {
   }, []);
 
   const selectedCard = cards.find((c) => c.id === selectedId) ?? null;
+
+  const previewCardData = {
+    fullName: 'Your Name',
+    holderType: selectedCard?.type || 'general_public',
+    documentNumber: 'NITA-PREVIEW-0001',
+    cardNumber: selectedCard ? `NITA-${selectedCard.type.replace(/_/g, '-').toUpperCase()}-PREVIEW` : 'NITA-PUBLIC-PREVIEW',
+    status: 'approved',
+    qrValue: `nita-preview-${selectedCard?.type || 'general_public'}`,
+  };
 
   const toggle = (id: string) => setSelectedId((prev) => (prev === id ? null : id));
 
@@ -519,11 +428,55 @@ export default function HealthCardPage() {
       </div>
 
       {/* ═══════════════════════════════════════════
+          PHYSICAL MEMBER CARD FOCAL
+      ═══════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-white py-14 sm:py-18">
+        <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-sky-100/70 blur-3xl" />
+        <div className="container-custom relative grid items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+          <div className="flex justify-center lg:justify-start">
+            <div className="w-full max-w-md rounded-[2rem] bg-gradient-to-br from-primary-50 via-white to-sky-50 p-3 shadow-[0_30px_70px_-35px_rgba(1,173,165,0.55)] ring-1 ring-primary-100 sm:p-5">
+              <HealthCard data={previewCardData} />
+            </div>
+          </div>
+          <div className="max-w-xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary-800">
+              <BadgeCheck className="h-3.5 w-3.5" /> Your member card preview
+            </span>
+            <h2 className="mt-4 font-heading text-3xl font-extrabold leading-tight text-neutral-950 sm:text-4xl">
+              A real card for every visit.
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-neutral-600 sm:text-base">
+              The physical card preview shows the details you will carry after approval: member name,
+              ID, membership type, active status, validity dates, and a verification mark. Choose a tier
+              below to update the card preview.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {[
+                ['Member identity', 'Your name and membership ID are printed after approval.'],
+                ['Active status', 'Use the card at reception to claim approved benefits.'],
+                ['One-year validity', 'Validity begins from your activation date.'],
+                ['Verification mark', 'A membership mark supports quick reception checks.'],
+              ].map(([title, copy]) => (
+                <div key={title} className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-bold uppercase tracking-wide text-neutral-900">{title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-neutral-600">{copy}</p>
+                </div>
+              ))}
+            </div>
+            <a href="#select-card" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-primary-600/20 transition-colors hover:bg-primary-700">
+              Choose your membership tier <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
           AD-CARD SELECTOR
       ═══════════════════════════════════════════ */}
       <section
         id="select-card"
-        className="section-padding bg-gradient-to-b from-amber-50/40 via-white to-neutral-50 scroll-mt-20 relative overflow-hidden"
+        className="section-padding relative scroll-mt-28 overflow-hidden bg-gradient-to-b from-amber-50/40 via-white to-neutral-50"
       >
         {/* Soft glow accents */}
         <div className="pointer-events-none absolute top-1/4 -left-32 w-72 h-72 rounded-full bg-amber-200/30 blur-3xl" />
@@ -538,11 +491,11 @@ export default function HealthCardPage() {
           />
 
           {cardsLoading ? (
-            <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 sm:gap-6">
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="w-full h-[340px] rounded-3xl bg-neutral-200 animate-pulse"
+                  className="h-44 w-full rounded-2xl bg-neutral-200 animate-pulse sm:h-52"
                 />
               ))}
             </div>
@@ -552,7 +505,7 @@ export default function HealthCardPage() {
               again later.
             </p>
           ) : (
-            <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 sm:gap-6">
               {cards.map((card, i) => (
                 <motion.div
                   key={card.id}

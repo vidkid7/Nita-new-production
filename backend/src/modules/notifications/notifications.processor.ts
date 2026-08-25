@@ -20,7 +20,7 @@ export class NotificationsProcessor {
     await this.notificationsService.sendEmail(patientEmail, 'Appointment Confirmation', emailHtml);
 
     // Send SMS
-    const smsMessage = `Your appointment with ${doctorName} is confirmed for ${date} at ${time}. - Nita Clinics`;
+    const smsMessage = `Your appointment with ${doctorName} is confirmed for ${date} at ${time}. - Nita Clinic`;
     await this.notificationsService.sendSMS(patientPhone, smsMessage);
   }
 
@@ -36,7 +36,7 @@ export class NotificationsProcessor {
 
     await this.notificationsService.sendSMS(
       patientPhone,
-      'Your appointment has been confirmed. See you soon! - Nita Clinics',
+      'Your appointment has been confirmed. See you soon! - Nita Clinic',
     );
   }
 
@@ -52,7 +52,7 @@ export class NotificationsProcessor {
 
     await this.notificationsService.sendSMS(
       patientPhone,
-      `Reminder: Your appointment with ${doctorName} is tomorrow at ${time}. - Nita Clinics`,
+      `Reminder: Your appointment with ${doctorName} is tomorrow at ${time}. - Nita Clinic`,
     );
   }
 
@@ -79,7 +79,7 @@ export class NotificationsProcessor {
       email,
       'Response to Your Enquiry',
       `<p>Dear ${name},</p>
-       <p>Thank you for contacting Nita Clinics. Here is our response:</p>
+       <p>Thank you for contacting Nita Clinic. Here is our response:</p>
        <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 15px 0;">
          ${response}
        </div>

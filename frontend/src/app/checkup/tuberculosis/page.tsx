@@ -3,13 +3,15 @@
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Calendar, Phone, Stethoscope, Microscope, Zap, ScanLine, FlaskConical, Droplets, ClipboardList, Activity, HeartPulse } from 'lucide-react';
-import { FiCalendar, FiCheckCircle, FiPhone, FiAlertCircle } from 'react-icons/fi';
+import { FiCalendar, FiPhone, FiAlertCircle } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { get } from '@/lib/api';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
+import { PackageSelectionSection, normalizePackageRecord, type PackageSelectionPackage } from '@/components/packages/PackageSelectionSection';
 
 const WHAT_IS_INCLUDED = [
   { icon: Stethoscope, title: 'Clinical Assessment', desc: 'Thorough history of symptoms, exposure, and risk factors. Physician-led physical examination including chest auscultation.' },
@@ -55,20 +57,13 @@ const FAQS = [
 
 export default function TuberculosisCheckupPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [packages, setPackages] = useState<
-    { id: string; name: string; discountedPrice: number; tests: string[] }[]
-  >([]);
+  const [packages, setPackages] = useState<PackageSelectionPackage[]>([]);
 
   useEffect(() => {
     get<Array<Record<string, unknown>>>('packages?category=tuberculosis')
       .then((rows) => {
         setPackages(
-          (rows || []).map((p) => ({
-            id: String(p.id),
-            name: String(p.name || ''),
-            discountedPrice: Number(p.discountedPrice ?? 0),
-            tests: Array.isArray(p.tests) ? (p.tests as string[]) : [],
-          })),
+          (rows || []).map((p) => normalizePackageRecord(p, 'tuberculosis')),
         );
       })
       .catch(() => setPackages([]));
@@ -169,27 +164,12 @@ export default function TuberculosisCheckupPage() {
               subtitle="A complete TB screening and treatment pathway, aligned with NTCC and WHO guidelines."
             />
           </motion.div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {WHAT_IS_INCLUDED.map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                className="group relative flex gap-4 overflow-hidden rounded-2xl border border-neutral-200/70 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_16px_36px_-16px_rgba(5,150,105,0.4)]"
-              >
-                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-40 transition-opacity duration-300 group-hover:opacity-100" />
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <div>
-                  <h3 className="font-semibold text-neutral-900 text-sm transition-colors group-hover:text-emerald-700">{item.title}</h3>
-                  <p className="text-xs text-neutral-500 mt-1 leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <IconTileList
+            items={WHAT_IS_INCLUDED}
+            category="tuberculosis check-up included service"
+            accent="emerald"
+            className="mx-auto max-w-5xl"
+          />
         </div>
       </section>
 
@@ -215,16 +195,7 @@ export default function TuberculosisCheckupPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-amber-600">Warning Signs</span>
               </div>
               <h2 className="text-2xl font-heading font-bold text-neutral-900 mb-6">Symptoms to Watch</h2>
-              <ul className="space-y-3">
-                {SYMPTOMS.map((s) => (
-                  <li key={s} className="group flex items-start gap-3 rounded-xl border border-neutral-200/60 bg-white px-3.5 py-2.5 text-sm text-neutral-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-[0_10px_22px_-14px_rgba(245,158,11,0.4)]">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-transform duration-300 group-hover:scale-110">
-                      <FiAlertCircle className="w-3.5 h-3.5" />
-                    </span>
-                    {s}
-                  </li>
-                ))}
-              </ul>
+              <IconTileList items={SYMPTOMS} category="tuberculosis warning signs" accent="amber" layout="list" />
               <div className="mt-6 rounded-xl border border-amber-200/70 bg-amber-50/70 p-4">
                 <p className="text-xs text-amber-800 font-medium">
                   If you experience any 2+ of these symptoms for over 2 weeks, seek evaluation immediately. TB is curable when detected early.
@@ -245,83 +216,20 @@ export default function TuberculosisCheckupPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">Laboratory</span>
               </div>
               <h2 className="text-2xl font-heading font-bold text-neutral-900 mb-6">Tests Included</h2>
-              <ul className="space-y-2.5">
-                {TESTS_INCLUDED.map((test) => (
-                  <li key={test} className="group flex items-center gap-3 rounded-xl border border-neutral-200/60 bg-white px-3.5 py-2.5 text-sm text-neutral-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-[0_10px_22px_-14px_rgba(5,150,105,0.4)]">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-md transition-transform duration-300 group-hover:scale-110">
-                      <FiCheckCircle className="w-3.5 h-3.5" strokeWidth={3} />
-                    </span>
-                    {test}
-                  </li>
-                ))}
-              </ul>
+              <IconTileList items={TESTS_INCLUDED} category="tuberculosis laboratory tests" accent="emerald" layout="list" />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ── Packages ── */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <SectionHeader
-              eyebrow="Pricing"
-              title="Choose Your"
-              highlight="Package"
-            />
-          </motion.div>
-          <div className="grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
-            {packages.length === 0 ? (
-              <p className="col-span-full text-center text-neutral-500 text-sm py-8">
-                No TB packages are published yet. Add them in the admin panel under Packages.
-              </p>
-            ) : (
-              packages.map((pkg, i) => {
-                const highlight = packages.length >= 3 && i === packages.length - 1;
-                return (
-                  <motion.div
-                    key={pkg.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className={cn(
-                      'rounded-2xl border p-6 flex flex-col',
-                      highlight
-                        ? 'border-emerald-300 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-md'
-                        : 'border-neutral-200 bg-white',
-                    )}
-                  >
-                    {highlight && (
-                      <span className="inline-block bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 w-fit uppercase tracking-wide">
-                        Featured
-                      </span>
-                    )}
-                    <h3 className="font-heading font-bold text-neutral-900 text-sm mb-2">{pkg.name}</h3>
-                    <p className="text-xs text-neutral-500 mb-4 flex-1">
-                      {pkg.tests.length ? pkg.tests.join(' · ') : 'See clinic for included tests.'}
-                    </p>
-                    <p className="text-2xl font-bold text-emerald-700 mb-4">
-                      NRS {pkg.discountedPrice.toLocaleString()}
-                    </p>
-                    <Link
-                      href={`/appointments/book?specialty=tuberculosis&type=checkup&package=${encodeURIComponent(pkg.name)}`}
-                      className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-emerald-700 transition-colors"
-                    >
-                      <Calendar className="w-3.5 h-3.5" />
-                      Book This Package
-                    </Link>
-                  </motion.div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </section>
+      <PackageSelectionSection
+        packages={packages}
+        specialty="tuberculosis"
+        specialtyLabel="TB & pulmonary care"
+        bookingHref="/appointments/book?specialty=tuberculosis&type=checkup"
+        accent="emerald"
+        emptyMessage="No TB packages are published yet. Add them in the admin panel under Packages."
+      />
 
       {/* ── FAQ ── */}
       <section className="section-padding bg-neutral-50">

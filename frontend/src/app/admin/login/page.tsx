@@ -108,14 +108,14 @@ export default function AdminLoginPage() {
           <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-8">
             <Image
               src="/logo.png"
-              alt="Nita Clinics"
+              alt="Nita Clinic"
               width={80}
               height={80}
               className="rounded-xl"
             />
           </div>
           <h1 className="text-4xl font-heading font-bold mb-4">
-            Nita Clinics
+            Nita Clinic
           </h1>
           <p className="text-primary-200 text-lg mb-8">
             Admin Control Panel
@@ -358,7 +358,7 @@ export default function AdminLoginPage() {
           </div>
 
           <p className="text-center text-primary-200 text-sm mt-6">
-            &copy; {new Date().getFullYear()} Nita Clinics
+            &copy; {new Date().getFullYear()} Nita Clinic
           </p>
         </motion.div>
       </div>

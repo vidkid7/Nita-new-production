@@ -30,9 +30,9 @@ const QUICK_LINKS = [
 
 const TRUST_POINTS = [
   'Board-Certified Experts',
-  'ISO Accredited Laboratory',
   'Walk-in & Online Booking',
   'Embassy & Seafarers Medical',
+  'Modern Lab & Diagnostics',
 ];
 
 export function HeroSection() {

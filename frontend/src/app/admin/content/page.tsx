@@ -43,9 +43,9 @@ export default function ContentManagementPage() {
 
   // About Section
   const [aboutContent, setAboutContent] = useState({
-    title: 'About Nita Clinics',
+    title: 'About Nita Clinic',
     subtitle: 'Trusted Healthcare in Nepal',
-    description: 'Nita Clinics is a modern clinic in Kathmandu providing comprehensive healthcare services with experienced specialists and updated technology.',
+    description: 'Nita Clinic is a modern clinic in Kathmandu providing comprehensive healthcare services with experienced specialists and updated technology.',
     mission: 'To provide accessible, affordable, and quality healthcare while maintaining the highest standards of safety and professionalism.',
     yearsExperience: '15+',
     happyPatients: '10,000+',

@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Phone, Award, Clock, CheckCircle2, Star, MapPin } from 'lucide-react';
+import { X, Calendar, Phone, Award, Clock, Star, MapPin, UserRound } from 'lucide-react';
 import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { IconTileList } from '@/components/ui/IconTileList';
+import { getDoctorAvailability } from '@/lib/doctor-availability';
 
 export interface DoctorDetailData {
   name: string;
@@ -16,6 +18,7 @@ export interface DoctorDetailData {
   bio?: string;
   phone?: string;
   isTopRated?: boolean;
+  isDoctor?: boolean;
   images: string[];
   bookingHref?: string;
   highlights?: string[];
@@ -42,6 +45,7 @@ export function DoctorDetailModal({ doctor, onClose }: DoctorDetailModalProps) {
   }, [doctor]);
 
   const bookHref = doctor?.bookingHref || `/appointments/book?doctor=${encodeURIComponent(doctor?.name || '')}&specialty=${encodeURIComponent(doctor?.specialization || '')}`;
+  const availability = doctor ? getDoctorAvailability(doctor) : '';
 
   return (
     <AnimatePresence>
@@ -83,13 +87,19 @@ export function DoctorDetailModal({ doctor, onClose }: DoctorDetailModalProps) {
 
               {/* Header image */}
               <div className="relative h-56 overflow-hidden rounded-t-3xl">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={doctor.images[0] || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80'}
-                  alt={`Dr. ${doctor.name}`}
-                  className="w-full h-full object-cover object-top"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                {doctor.images[0] ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={doctor.images[0]}
+                    alt={`${doctor.isDoctor === false ? '' : 'Dr. '}${doctor.name}`}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 via-primary-50 to-teal-50 text-primary-700" aria-label="Profile image placeholder">
+                    <UserRound className="h-20 w-20 stroke-[1.2]" aria-hidden="true" />
+                  </div>
+                )}
+                {doctor.images[0] && <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />}
 
                 {/* Name overlay */}
                 <div className="absolute bottom-5 left-6 right-12">
@@ -99,7 +109,7 @@ export function DoctorDetailModal({ doctor, onClose }: DoctorDetailModalProps) {
                     </span>
                   )}
                   <h2 className="text-2xl font-heading font-bold text-white leading-tight">
-                    Dr. {doctor.name}
+                    {doctor.isDoctor === false ? doctor.name : `Dr. ${doctor.name}`}
                   </h2>
                   <p className="text-primary-200 text-sm font-semibold mt-0.5">{doctor.specialization}</p>
                 </div>
@@ -132,12 +142,10 @@ export function DoctorDetailModal({ doctor, onClose }: DoctorDetailModalProps) {
 
                 {/* Availability */}
                 <div className="flex flex-wrap gap-4">
-                  {doctor.availableDays && (
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Calendar className="w-4 h-4 text-primary-500" />
-                      <span>Available: <strong className="text-neutral-800">{doctor.availableDays}</strong></span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2 text-sm text-neutral-600">
+                    <Calendar className="w-4 h-4 text-primary-500" />
+                    <span>Available: <strong className="text-neutral-800">{availability}</strong></span>
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-neutral-600">
                     <MapPin className="w-4 h-4 text-teal-500" />
                     <span>NITA Clinic, Maharajgunj, Kathmandu</span>
@@ -148,14 +156,14 @@ export function DoctorDetailModal({ doctor, onClose }: DoctorDetailModalProps) {
                 {doctor.highlights && doctor.highlights.length > 0 && (
                   <div>
                     <h3 className="font-heading font-bold text-neutral-900 mb-3">Specialties & Highlights</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {doctor.highlights.map((h) => (
-                        <span key={h} className="inline-flex items-center gap-1.5 bg-primary-50 border border-primary-100 text-primary-800 text-xs font-medium px-3 py-1.5 rounded-full">
-                          <CheckCircle2 className="w-3 h-3 text-primary-500" />
-                          {h}
-                        </span>
-                      ))}
-                    </div>
+                    <IconTileList
+                      items={doctor.highlights}
+                      category={`${doctor.specialization} profile highlights`}
+                      accent="teal"
+                      layout="list"
+                      className="gap-2"
+                      itemClassName="min-h-[58px] rounded-2xl p-2.5"
+                    />
                   </div>
                 )}
 

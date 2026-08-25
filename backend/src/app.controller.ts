@@ -18,7 +18,7 @@ export class AppController {
   @Get()
   getRoot() {
     return {
-      name: 'Nita Clinics API',
+      name: 'Nita Clinic API',
       version: '1.0',
       status: 'running',
       docs: '/docs',

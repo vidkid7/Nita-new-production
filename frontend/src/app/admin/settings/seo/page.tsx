@@ -19,7 +19,7 @@ type SeoForm = {
 };
 
 const defaults: SeoForm = {
-  site_title: 'Nita Clinics',
+  site_title: 'Nita Clinic',
   site_tagline: 'Your Trusted Healthcare Partner',
   meta_description: '',
   ga_id: '',

@@ -25,7 +25,7 @@ class WorkingHoursDto {
 }
 
 export class CreateClinicDto {
-  @ApiProperty({ example: 'Nita Clinics Main Branch' })
+  @ApiProperty({ example: 'Nita Clinic Main Branch' })
   @IsString()
   name: string;
 

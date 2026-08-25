@@ -172,7 +172,7 @@ export default function PagesPage() {
       const heroSection = sections.find((s) => s.sectionKey === 'hero');
 
       setPageContent({
-        metaTitle: seoSection?.seo?.title || (seoSection?.metadata as any)?.metaTitle || `${page.name} | Nita Clinics`,
+        metaTitle: seoSection?.seo?.title || (seoSection?.metadata as any)?.metaTitle || `${page.name} | Nita Clinic`,
         metaDescription:
           seoSection?.seo?.description || (seoSection?.metadata as any)?.metaDescription || page.description,
         heroTitle: (heroSection?.content as any)?.title || heroSection?.title || page.name,
@@ -182,7 +182,7 @@ export default function PagesPage() {
       console.error('Failed to load page content', error);
       // Fallback to defaults if none exist
       setPageContent({
-        metaTitle: `${page.name} | Nita Clinics`,
+        metaTitle: `${page.name} | Nita Clinic`,
         metaDescription: page.description,
         heroTitle: page.name,
         heroSubtitle: page.description,

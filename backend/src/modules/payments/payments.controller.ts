@@ -93,6 +93,10 @@ export class PaymentsController {
   }
 
   @Get('transactions')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List payment transactions (admin)' })
   @ApiQuery({ name: 'limit', required: false })
   listTransactions(@Query('limit') limit?: string) {
     return this.paymentsService.listTransactions(limit ? Number(limit) : 50);

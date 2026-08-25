@@ -88,6 +88,10 @@ export class AppointmentsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STAFF)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get appointment by ID (admin)' })
   findOne(@Param('id') id: string) {
     return this.appointmentsService.findOne(id);
   }

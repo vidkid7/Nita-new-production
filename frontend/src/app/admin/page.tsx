@@ -274,7 +274,7 @@ export default function AdminDashboard() {
               {greeting()}, {user?.name || 'Admin'}!
             </h1>
             <p className="text-primary-100 mt-1">
-              Here's what's happening at Nita Clinics today.
+              Here's what's happening at Nita Clinic today.
             </p>
           </div>
           <div className="flex items-center gap-3">

@@ -732,3 +732,31 @@
 .blog-content em {
   @apply italic;
 }
+
+/* ──────────────────────────────────────────────────────────
+   Print styles — health card pickup
+   Hides everything except the card itself when printing from
+   the patient portal's "Print Card" action.
+────────────────────────────────────────────────────────── */
+@media print {
+  body {
+    @apply bg-white;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .health-card-print, .health-card-print * {
+    visibility: visible;
+  }
+  .health-card-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  /* Show both front and back when printing (no flip) */
+  .health-card-print [data-card-back] {
+    display: block !important;
+    margin-top: 1.5rem;
+  }
+}

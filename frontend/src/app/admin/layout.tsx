@@ -180,13 +180,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               <div className="w-10 h-10 relative rounded-lg overflow-hidden bg-white">
                 <Image
                   src={settings.logo || '/logo.png'}
-                  alt={settings.siteName || 'Nita Clinics'}
+                  alt={settings.siteName || 'Nita Clinic'}
                   fill
                   className="object-contain p-1"
                 />
               </div>
               <div className="hidden sm:block">
-                <span className="text-white font-semibold text-sm block leading-tight">Nita Clinics</span>
+                <span className="text-white font-semibold text-sm block leading-tight">Nita Clinic</span>
                 <span className="text-neutral-400 text-xs">Admin Panel</span>
               </div>
             </Link>

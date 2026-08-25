@@ -235,7 +235,7 @@ export default function GalleryPage() {
       <CTAFooter
         title="Want to see it"
         highlight="in person?"
-        subtitle="Visit the NITA Clinics team, tour the facilities, and meet our care staff."
+        subtitle="Visit the NITA Clinic team, tour the facilities, and meet our care staff."
         actions={[
           { label: 'Book Appointment', href: '/appointments/book' },
           { label: 'Visit Contact Page', href: '/contact' },

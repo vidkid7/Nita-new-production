@@ -8,7 +8,9 @@ export type HomeServiceIconKey =
   | 'female'
   | 'heartbeat'
   | 'creditCard'
-  | 'pill';
+  | 'pill'
+  | 'xray'
+  | 'syringe';
 
 export type HomeServiceColorKey = 'primary' | 'rose' | 'emerald' | 'sky' | 'amber' | 'indigo';
 
@@ -83,6 +85,8 @@ const ICON_KEYS: HomeServiceIconKey[] = [
   'heartbeat',
   'creditCard',
   'pill',
+  'xray',
+  'syringe',
 ];
 const COLOR_KEYS: HomeServiceColorKey[] = ['primary', 'rose', 'emerald', 'sky', 'amber', 'indigo'];
 

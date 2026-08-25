@@ -6,6 +6,7 @@ import {
   DoodleSparkle,
   DoodleStar,
 } from './TestimonialArtworks';
+import { HealthCardVisual } from '@/components/health-card/HealthCardVisual';
 
 const benefits = [
   'Free OPD for Registered Doctors',
@@ -111,84 +112,14 @@ export function HealthCardBanner() {
               <span className="pulse-ring absolute left-1/2 top-1/2 h-64 w-64 rounded-full border-2 border-teal-300/30" aria-hidden="true" />
               <span className="pulse-ring absolute left-1/2 top-1/2 h-64 w-64 rounded-full border-2 border-teal-300/20 anim-delay-2" aria-hidden="true" />
 
-              <div className="group relative w-80 overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary-500 via-primary-400 to-teal-300 p-6 shadow-[0_30px_70px_-20px_rgba(1,173,165,0.65)] ring-1 ring-white/25 sm:w-96">
-                {/* card sheen */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/25 via-transparent to-black/10" />
-                {/* shine sweep */}
-                <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
-
-                {/* brand + contactless */}
-                <div className="relative flex items-start justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <DoodleCross className="h-7 w-7" stroke="#0d9488" soft="rgba(13,148,136,0.25)" />
-                    <div>
-                      <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-primary-950/60">
-                        Nita Clinics
-                      </p>
-                      <p className="text-sm font-bold leading-tight text-primary-950">
-                        Smart Health Card
-                      </p>
-                    </div>
-                  </div>
-                  {/* contactless waves */}
-                  <svg className="h-6 w-6 text-primary-950/70" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M7 5.5C11 8.6 11 15.4 7 18.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    <path d="M10.5 8.5C12.8 10.4 12.8 13.6 10.5 15.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    <circle cx="13.8" cy="12" r="1.2" fill="currentColor" />
-                  </svg>
-                </div>
-
-                {/* EMV chip */}
-                <div className="relative mt-6 mb-5 inline-block h-9 w-12 overflow-hidden rounded-md bg-gradient-to-br from-amber-200 via-amber-300 to-amber-500 ring-1 ring-amber-700/30">
-                  <div className="absolute inset-0 grid grid-cols-2 grid-rows-3">
-                    {[0, 1, 2, 3, 4, 5].map((i) => (
-                      <span key={i} className="border-r border-b border-amber-700/25 last:border-b-0" />
-                    ))}
-                  </div>
-                  <div className="absolute inset-[6px] rounded-[4px] border border-amber-700/40" />
-                </div>
-
-                {/* ECG trace across card */}
-                <svg className="relative mb-5 h-8 w-full" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true">
-                  <path
-                    d="M0 24 H90 L105 12 L120 32 L135 18 L150 24 H300"
-                    fill="none"
-                    stroke="rgba(1,77,73,0.55)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeDasharray="100 20"
-                    className="animate-ecg-flow"
-                  />
-                </svg>
-
-                {/* member info */}
-                <div className="relative flex items-end justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="text-[9px] uppercase tracking-widest text-primary-950/55">Card Holder</p>
-                    <p className="truncate font-semibold text-primary-950">Member Name</p>
-                    <p className="mt-0.5 truncate font-mono text-[10px] tracking-widest text-primary-950/55">
-                      NITA·HC·2026·0001
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-[9px] uppercase tracking-widest text-primary-950/55">Valid Until</p>
-                    <p className="text-xs font-bold text-primary-950">12/26</p>
-                    <span className="mt-1 inline-block rounded-md bg-primary-900/85 px-1.5 py-0.5 text-[8px] font-black tracking-widest text-teal-200">
-                      HEALTH+
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <HealthCardVisual
+                displayName="Member Name"
+                cardNumber="NITA·HC·2026·0001"
+                validUntil="12/26"
+                className="w-80 sm:w-96"
+              />
             </div>
 
-            {/* status pill under card */}
-            <div className="mt-6 flex justify-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-200 backdrop-blur-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-vital-ping" />
-                Card Active
-              </span>
-            </div>
           </div>
         </div>
       </div>

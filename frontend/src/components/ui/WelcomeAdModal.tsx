@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   FiX,
   FiArrowRight,
@@ -14,7 +15,9 @@ import {
   FiActivity,
   FiDroplet,
   FiPackage,
+  FiTag,
 } from 'react-icons/fi';
+import { BRAND } from '@/lib/brand';
 
 type Card = {
   id: string;
@@ -101,8 +104,8 @@ const TYPE_STYLES: Record<
     holderLabel: 'Partner Staff',
     cardNumber: '•••• •••• •••• 3003',
     validThru: '12/26',
-    bigDeal: '100% OPD',
-    smallDeal: 'Same benefits as verified doctors',
+    bigDeal: '50% OPD',
+    smallDeal: 'Half price on all doctor consultations',
     badge: '🏢 Corporate',
     badgeColor: 'bg-emerald-300 text-emerald-900',
     gradient: 'bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500',
@@ -138,7 +141,7 @@ const FALLBACK_TIER_ORDER: (keyof typeof TYPE_STYLES)[] = [
  *  - Step 0: Health Card ad (4 tiers in a 2x2 grid, mirrors /health-card AdCard)
  *  - Step 1: Health Pack ad (3-4 packages in a 2x2 grid)
  */
-export function WelcomeAdModal({ visible }: { visible: boolean }) {
+export function WelcomeAdModal({ visible, onDismiss }: { visible: boolean; onDismiss?: () => void }) {
   const [step, setStep] = useState<0 | 1 | 2>(0); // 0 = first ad, 1 = second ad, 2 = hidden
   const [cards, setCards] = useState<Card[]>([]);
   const [packages, setPackages] = useState<Pkg[]>([]);
@@ -176,6 +179,7 @@ export function WelcomeAdModal({ visible }: { visible: boolean }) {
 
   function dismiss() {
     setStep(2);
+    onDismiss?.();
   }
 
   function next() {
@@ -245,6 +249,9 @@ export function WelcomeAdModal({ visible }: { visible: boolean }) {
 
                   {/* heading */}
                   <div className="mb-4 text-center">
+                    <div className="mx-auto mb-3 inline-flex rounded-2xl bg-white px-3 py-2 shadow-sm ring-1 ring-primary-100">
+                      <Image src={BRAND.logo} alt="Nita Clinic" width={150} height={76} className="h-10 w-auto object-contain" />
+                    </div>
                     <span className="inline-flex items-center gap-2 rounded-full bg-primary-50 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary-700 border border-primary-100">
                       <span className="h-1.5 w-1.5 rounded-full bg-primary-500 animate-vital-ping" />
                       Now Distributing
@@ -443,21 +450,13 @@ export function WelcomeAdModal({ visible }: { visible: boolean }) {
                               whileHover={{ y: -4 }}
                               className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200/70 hover:shadow-md hover:ring-emerald-200 transition-all"
                             >
-                              {/* cover image */}
-                              <div className="relative h-20 overflow-hidden">
-                                {p.image ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img
-                                    src={p.image}
-                                    alt={p.name}
-                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-                                ) : (
-                                  <div className="h-full w-full bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600" />
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                              {/* Data-first package header — no poster image */}
+                              <div className="relative flex h-20 items-center gap-2 overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 px-3 text-white">
+                                <div className="pointer-events-none absolute inset-0 opacity-15" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '12px 12px' }} />
+                                <FiPackage className="relative h-6 w-6 shrink-0" />
+                                <span className="relative line-clamp-2 text-[10px] font-bold uppercase tracking-wide">Included tests &amp; live offer</span>
                                 {pct > 0 && (
-                                  <span className="absolute top-1.5 right-1.5 inline-flex items-center gap-0.5 rounded-full bg-white/95 px-1.5 py-0.5 text-[9px] font-black text-emerald-700 shadow-sm">
+                                  <span className="absolute right-1.5 top-1.5 inline-flex items-center gap-0.5 rounded-full bg-white/95 px-1.5 py-0.5 text-[9px] font-black text-emerald-700 shadow-sm">
                                     <FiTag className="w-2.5 h-2.5" />
                                     {pct}% OFF
                                   </span>

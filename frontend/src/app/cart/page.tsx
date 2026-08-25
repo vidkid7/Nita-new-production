@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { FiShoppingCart, FiTrash2, FiCreditCard } from 'react-icons/fi';
+import { FiShoppingCart, FiTrash2, FiCreditCard, FiCalendar } from 'react-icons/fi';
 import { CartItem, getCartItems, getCartTotals, removeFromCart } from '@/lib/cart';
 
 export default function CartPage() {

@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { get } from '@/lib/api';
 
+const DEFAULT_LOGO = '/images/nita-clinics-logo.png';
+
+function normalizeSiteName(value?: string) {
+  return value?.replace(/\bNita Clinics\b/gi, 'Nita Clinic') || 'Nita Clinic';
+}
+
 interface Settings {
   logo?: string;
   favicon?: string;
@@ -13,9 +19,9 @@ let fetchPromise: Promise<Settings> | null = null;
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings>(cachedSettings || {
-    logo: '/logo.png', // Default fallback
-    favicon: '/logo.png',
-    siteName: 'Nita Clinics',
+    logo: DEFAULT_LOGO,
+    favicon: DEFAULT_LOGO,
+    siteName: 'Nita Clinic',
   });
   const [isLoading, setIsLoading] = useState(!cachedSettings);
 
@@ -46,19 +52,19 @@ export function useSettings() {
       fetchPromise = get<Settings>('settings/object')
         .then((data) => {
           cachedSettings = {
-            logo: data.logo || '/logo.png',
-            favicon: data.favicon || '/logo.png',
-            siteName: data.siteName || 'Nita Clinics',
+            logo: data.logo || DEFAULT_LOGO,
+            favicon: data.favicon || DEFAULT_LOGO,
             ...data,
+            siteName: normalizeSiteName(data.siteName),
           };
           return cachedSettings;
         })
         .catch((error) => {
           console.error('Failed to load settings', error);
           return {
-            logo: '/logo.png',
-            favicon: '/logo.png',
-            siteName: 'Nita Clinics',
+            logo: DEFAULT_LOGO,
+            favicon: DEFAULT_LOGO,
+            siteName: 'Nita Clinic',
           };
         })
         .finally(() => {

@@ -63,10 +63,9 @@ const proofPoints = [
 ];
 
 const trustBadges = [
-  'Government-Registered & Accredited',
+  'Government Registered',
   'Approved Seafarers Health Screening',
   'Embassy-Approved Medical Exams',
-  'ISO-Aligned Quality Processes',
   'Trained Clinical Staff',
   'Privacy-Compliant Records',
 ];
@@ -122,7 +121,7 @@ export function TrustSection() {
           ))}
         </div>
 
-        {/* Accreditation strip */}
+        {/* Trust badges strip */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -132,8 +132,8 @@ async function bootstrap() {
 
     if (configService.get('NODE_ENV') !== 'production') {
       const config = new DocumentBuilder()
-        .setTitle('Nita Clinics API')
-        .setDescription('REST API for Nita Clinics services and administration')
+        .setTitle('Nita Clinic API')
+        .setDescription('REST API for Nita Clinic services and administration')
         .setVersion('1.0')
         .addBearerAuth()
         .addTag('auth', 'Authentication endpoints')
@@ -166,7 +166,7 @@ async function bootstrap() {
     await app.listen(port, '0.0.0.0');
     // eslint-disable-next-line no-console
     console.log(`
-  Nita Clinics API Server
+  Nita Clinic API Server
   ============================
   Environment: ${configService.get('NODE_ENV', 'development')}
   Port: ${port}

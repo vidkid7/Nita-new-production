@@ -20,6 +20,7 @@ import {
 import { PremiumLandingHero } from '@/components/ui/PremiumLandingHero';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
 import { FiCalendar, FiPhone } from 'react-icons/fi';
 
 const PACKAGES = [
@@ -30,7 +31,7 @@ const PACKAGES = [
     tagline: '15–30 minute private visit',
     price: 2500,
     description:
-      'A licensed Nita Clinics doctor comes to your home for a full consultation, basic physical exam, prescription and referral advice.',
+      'A licensed Nita Clinic doctor comes to your home for a full consultation, basic physical exam, prescription and referral advice.',
     features: [
       'General physician / family medicine',
       'Basic vitals + physical exam',
@@ -46,7 +47,7 @@ const PACKAGES = [
     tagline: 'Phlebotomist visits, same-day pickup',
     price: 800,
     description:
-      'Trained phlebotomist collects blood, urine or stool samples at your home. Samples are sealed and transported cold-chain to our NABL-grade lab.',
+      'Trained phlebotomist collects blood, urine or stool samples at your home. Samples are sealed and transported by cold chain to our laboratory.',
     features: [
       'Single test or panel collection',
       'Sterile, sealed vacuum tubes used',
@@ -83,7 +84,7 @@ const INCLUDED = [
 const STEPS = [
   { n: '01', title: 'Book your slot', copy: 'Pick a service, choose a date and a 2-hour window.' },
   { n: '02', title: 'We confirm by phone', copy: 'Our coordinator calls within 30 minutes to confirm.' },
-  { n: '03', title: 'Clinician arrives', copy: 'A Nita Clinics professional arrives with a sterile kit at your home.' },
+  { n: '03', title: 'Clinician arrives', copy: 'A Nita Clinic professional arrives with a sterile kit at your home.' },
   { n: '04', title: 'Reports & follow-up', copy: 'Receive digital reports and a free follow-up call within 48 hours.' },
 ];
 
@@ -144,7 +145,7 @@ export default function HomeVisitPage() {
   return (
     <main>
       <PremiumLandingHero
-        eyebrow="Home Visit Service · Nita Clinics"
+        eyebrow="Home Visit Service · Nita Clinic"
         title="Doctor, nurse or lab,"
         highlight="at your doorstep."
         description="Skip the waiting room. Book a doctor consultation, lab sample collection or vaccination at your home — same standard of care, same digital records, transparent pricing."
@@ -155,7 +156,7 @@ export default function HomeVisitPage() {
         trustPoints={[
           'NMC-registered doctors and trained nurses',
           'Sterile single-use kit brought to your home',
-          'Same-day lab reports from our NABL-grade lab',
+          'Same-day lab reports from our laboratory',
           'Available 7 days a week in Kathmandu Valley',
         ]}
         stats={[
@@ -201,14 +202,14 @@ export default function HomeVisitPage() {
                 <h3 className="mt-5 font-heading text-lg font-bold text-neutral-900">{p.title}</h3>
                 <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-primary-700">{p.tagline}</p>
                 <p className="mt-3 text-sm text-neutral-600 leading-relaxed">{p.description}</p>
-                <ul className="mt-4 space-y-1.5">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-xs text-neutral-600">
-                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-500" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
+                <IconTileList
+                  items={p.features}
+                  category={`${p.title} home service features`}
+                  accent={i === 0 ? 'emerald' : i === 1 ? 'rose' : 'violet'}
+                  layout="list"
+                  className="mt-5 gap-2"
+                  itemClassName="rounded-2xl p-3"
+                />
                 <div className="mt-5 flex items-end justify-between border-t border-neutral-100 pt-4">
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">From</p>
@@ -238,24 +239,12 @@ export default function HomeVisitPage() {
             subtitle="No surprise fees. The visit fee covers clinician travel within Kathmandu Valley and a 48-hour follow-up call."
             className="mb-10"
           />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {INCLUDED.map((p, i) => (
-              <motion.div
-                key={p.title}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="rounded-2xl border border-neutral-100 bg-white p-6 shadow-soft"
-              >
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                  {p.icon}
-                </span>
-                <h3 className="mt-3 font-heading text-sm font-bold text-neutral-900">{p.title}</h3>
-                <p className="mt-1.5 text-xs text-neutral-500 leading-relaxed">{p.copy}</p>
-              </motion.div>
-            ))}
-          </div>
+          <IconTileList
+            items={INCLUDED}
+            category="home visit service included"
+            accent="emerald"
+            className="mx-auto max-w-5xl lg:grid-cols-4"
+          />
         </div>
       </section>
 

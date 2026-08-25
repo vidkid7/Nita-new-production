@@ -19,6 +19,7 @@ import {
 import { PremiumLandingHero } from '@/components/ui/PremiumLandingHero';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
 import { FiCalendar, FiPhone } from 'react-icons/fi';
 
 const SPECIALTIES = [
@@ -76,7 +77,7 @@ const PLANS = [
 const HOW = [
   { icon: <FiCalendar className="h-5 w-5" />, title: 'Book a slot', copy: 'Pick a specialty, a plan and a 30-min window that suits you.' },
   { icon: <Video className="h-5 w-5" />, title: 'We send a link', copy: 'You get a secure video link by SMS/email 5 minutes before the call.' },
-  { icon: <Stethoscope className="h-5 w-5" />, title: 'Consult online', copy: 'Speak to a Nita Clinics doctor over video or audio — no app install needed.' },
+  { icon: <Stethoscope className="h-5 w-5" />, title: 'Consult online', copy: 'Speak to a Nita Clinic doctor over video or audio — no app install needed.' },
   { icon: <FileText className="h-5 w-5" />, title: 'Get prescription', copy: 'Receive a digital prescription, e-referral and care plan by email.' },
 ];
 
@@ -133,7 +134,7 @@ export default function OnlineConsultationPage() {
     <main>
       <PremiumLandingHero
         eyebrow="Online Consultation · Telemedicine"
-        title="A Nita Clinics doctor,"
+        title="A Nita Clinic doctor,"
         highlight="in your pocket."
         description="Speak to a licensed doctor over secure video from home, office or on the go. Get a digital prescription, e-referral and care plan — no travel, no waiting room."
         videoSrc="/videos/hero/doctor-writing-appointment.mp4"
@@ -158,7 +159,7 @@ export default function OnlineConsultationPage() {
         panelTitle="Care that fits your day."
         panelItems={[
           'Pick a specialty, choose a plan and a time that works for you.',
-          'A Nita Clinics doctor calls you on a secure video link — no app install.',
+          'A Nita Clinic doctor calls you on a secure video link — no app install.',
           'You get a digital prescription, e-referral for lab tests, and a care plan by email.',
         ]}
       />
@@ -221,14 +222,14 @@ export default function OnlineConsultationPage() {
                   <span className="font-semibold text-neutral-700">{p.duration}</span> session
                 </p>
                 <p className="mt-3 text-sm text-neutral-600 leading-relaxed">{p.desc}</p>
-                <ul className="mt-4 space-y-1.5">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-xs text-neutral-600">
-                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-sky-500" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
+                <IconTileList
+                  items={p.features}
+                  category={`${p.title} online consultation features`}
+                  accent="blue"
+                  layout="list"
+                  className="mt-5 gap-2"
+                  itemClassName="rounded-2xl p-3"
+                />
                 <div className="mt-5 flex items-end justify-between border-t border-neutral-100 pt-4">
                   <p className="font-heading text-2xl font-extrabold text-neutral-900">NPR {p.price.toLocaleString()}</p>
                   <button
@@ -283,7 +284,7 @@ export default function OnlineConsultationPage() {
             {[
               { icon: <Lock className="h-5 w-5" />, title: 'Encrypted video', copy: 'End-to-end encrypted. We never store the call recording.' },
               { icon: <FileText className="h-5 w-5" />, title: 'Digital Rx', copy: 'Prescription and e-referral delivered to your email instantly.' },
-              { icon: <Heart className="h-5 w-5" />, title: 'One record', copy: 'Online notes feed into your Nita Clinics health record automatically.' },
+              { icon: <Heart className="h-5 w-5" />, title: 'One record', copy: 'Online notes feed into your Nita Clinic health record automatically.' },
             ].map((p) => (
               <div key={p.title} className="flex flex-col items-center gap-2">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 text-white">
@@ -431,7 +432,7 @@ export default function OnlineConsultationPage() {
       <CTAFooter
         title="Prefer to see a doctor"
         highlight="in person?"
-        subtitle="Book an in-clinic appointment at Nita Clinics, Bhimsengola-09, Kathmandu."
+        subtitle="Book an in-clinic appointment at Nita Clinic, Bhimsengola-09, Kathmandu."
         actions={[
           { label: 'Book In-Clinic', href: '/appointments/book', icon: <FiCalendar className="h-4 w-4" /> },
           { label: 'Contact Us', href: '/contact' },

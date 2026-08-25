@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import type { DiagnosticTest } from '@/lib/diagnostic-data';
 import { getSavingsPercent, testDetailPath, testImageOrPlaceholder } from '@/lib/diagnostic-data';
+import { getCatalogVisual } from '@/lib/catalog-visuals';
+import { IconTileList } from '@/components/ui/IconTileList';
 
 interface TestCardProps {
   test: DiagnosticTest;
@@ -49,6 +51,7 @@ function getSampleIcon(sampleType: string) {
 
 export function TestCard({ test, className }: TestCardProps) {
   const allImages = [testImageOrPlaceholder(test)];
+  const { Icon: TestIcon, iconClassName, badgeClassName } = getCatalogVisual(test.name, test.category);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -141,6 +144,10 @@ export function TestCard({ test, className }: TestCardProps) {
           )}
         </div>
 
+        <div className={cn('absolute bottom-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/60 shadow-lg backdrop-blur-sm', badgeClassName)}>
+          <TestIcon className={cn('h-8 w-8', iconClassName)} aria-hidden="true" />
+        </div>
+
         {/* Savings badge top-right */}
         {savings > 0 && (
           <div className="absolute top-3 right-3 z-10">
@@ -191,7 +198,12 @@ export function TestCard({ test, className }: TestCardProps) {
           variants={itemVariants}
           className="font-heading font-bold text-base text-neutral-900 leading-snug line-clamp-2"
         >
-          {test.name}
+          <span className="inline-flex items-start gap-2">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary-50">
+              <TestIcon className={cn('h-4 w-4', iconClassName)} aria-hidden="true" />
+            </span>
+            <span>{test.name}</span>
+          </span>
         </motion.h3>
 
         {/* Description */}
@@ -229,20 +241,22 @@ export function TestCard({ test, className }: TestCardProps) {
             </button>
             <AnimatePresence initial={false}>
               {showIncludes && (
-                <motion.ul
+                <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.22 }}
-                  className="overflow-hidden mt-1.5 space-y-0.5"
+                  className="overflow-hidden mt-1.5"
                 >
-                  {test.includes.map((item) => (
-                    <li key={item} className="flex items-start gap-1.5 text-[11px] text-neutral-600">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </motion.ul>
+                  <IconTileList
+                    items={test.includes}
+                    category={`${test.name} included tests`}
+                    accent="teal"
+                    layout="list"
+                    className="gap-1.5"
+                    itemClassName="min-h-[46px] rounded-xl p-2"
+                  />
+                </motion.div>
               )}
             </AnimatePresence>
           </motion.div>
@@ -291,12 +305,6 @@ export function TestCard({ test, className }: TestCardProps) {
               className="flex-1 inline-flex items-center justify-center gap-1 bg-primary-600 text-white text-xs font-semibold py-2 rounded-xl hover:bg-primary-700 transition-colors"
             >
               Book Test
-            </Link>
-            <Link
-              href={bookHref}
-              className="flex-1 inline-flex items-center justify-center gap-1 border border-primary-200 text-primary-700 text-xs font-semibold py-2 rounded-xl hover:bg-primary-50 hover:border-primary-400 transition-colors"
-            >
-              View Details
             </Link>
           </div>
         </motion.div>

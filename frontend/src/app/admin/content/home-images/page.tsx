@@ -201,7 +201,7 @@ export default function HomeImagesPage() {
         <div>
           <h1 className="text-2xl font-heading font-bold text-neutral-900">Home page images</h1>
           <p className="text-neutral-600 mt-1">
-            Matches the current Nita Clinics homepage layout — not the old multi-slide hero.
+            Matches the current Nita Clinic homepage layout — not the old multi-slide hero.
           </p>
         </div>
         <Button onClick={handleSaveAll} isLoading={isSaving} variant="secondary">

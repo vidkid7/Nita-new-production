@@ -16,6 +16,7 @@ import {
 import { Plus } from 'lucide-react';
 import { useSettings } from '@/hooks/useSettings';
 import { DoodleHeart } from '@/components/home/TestimonialArtworks';
+import { BRAND } from '@/lib/brand';
 
 const links = {
   services: [
@@ -41,7 +42,7 @@ const links = {
 };
 
 const socials = [
-  { name: 'Facebook', icon: FiFacebook, href: 'https://facebook.com/nitaclinics' },
+  { name: 'Facebook', icon: FiFacebook, href: 'https://www.facebook.com/profile.php?id=61592513670112' },
   { name: 'Instagram', icon: FiInstagram, href: 'https://instagram.com/nitaclinics' },
   { name: 'YouTube', icon: FiYoutube, href: 'https://youtube.com/@nitaclinics' },
 ];
@@ -129,16 +130,17 @@ export function Footer() {
           <div className="lg:col-span-5">
             <Link
               href="/"
-              className="group inline-flex items-center gap-3 mb-4 transition-all duration-300 hover:opacity-90"
+              className="group mb-5 inline-flex items-center transition-opacity duration-300 hover:opacity-90"
             >
-              <div className="relative h-14 w-44 flex-shrink-0">
+              <span className="flex w-48 items-center justify-start rounded-xl bg-white/95 px-2 py-2 shadow-sm ring-1 ring-white/20 sm:w-56">
                 <Image
-                  src="/logo.png"
+                  src={BRAND.logo}
                   alt="Nita Clinic"
-                  fill
-                  className="object-contain object-left transition-transform duration-500 group-hover:scale-[1.02]"
+                  width={224}
+                  height={170}
+                  className="h-auto w-full object-contain transition-transform duration-300 group-hover:scale-[1.01]"
                 />
-              </div>
+              </span>
             </Link>
 
             <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-teal-400/25 bg-teal-400/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-teal-200">
@@ -147,7 +149,7 @@ export function Footer() {
             </div>
 
             <p className="text-primary-200 text-sm leading-relaxed mb-4 max-w-md">
-              Nita Clinics is an accredited multi-specialty clinic in Kathmandu offering pathology
+              Nita Clinic is a trusted multi-specialty clinic in Kathmandu offering pathology
               labs, specialist consultations, vaccination, and preventive health care at affordable
               prices.
             </p>
@@ -276,7 +278,7 @@ export function Footer() {
           <div className="h-px w-full bg-gradient-to-r from-teal-400/30 via-primary-600/30 to-transparent mb-3" />
           <div className="relative overflow-hidden rounded-2xl border border-primary-700/60 shadow-[0_18px_50px_-20px_rgba(0,0,0,0.6)]">
             <iframe
-              title="Nita Clinics location map"
+              title="Nita Clinic location map"
               src={NITA_GOOGLE_MAPS_SRC}
               width="100%"
               height="280"
@@ -417,7 +419,7 @@ export function Footer() {
       <div className="relative border-t border-white/5">
         <div className="container-custom py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-sm">
           <div className="flex flex-wrap items-center gap-4 text-primary-300">
-            <span>&copy; {year} Nita Clinics. All rights reserved.</span>
+            <span>&copy; {year} Nita Clinic. All rights reserved.</span>
             {links.legal.map((l) => (
               <Link
                 key={l.name}

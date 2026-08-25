@@ -10,7 +10,7 @@ export class CreateContentDto {
   @IsString()
   sectionKey: string;
 
-  @ApiProperty({ example: { title: 'Welcome', subtitle: 'Nita Clinics' } })
+  @ApiProperty({ example: { title: 'Welcome', subtitle: 'Nita Clinic' } })
   @IsObject()
   content: Record<string, unknown>;
 

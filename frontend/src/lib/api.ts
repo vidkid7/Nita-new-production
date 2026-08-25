@@ -70,7 +70,12 @@ api.interceptors.response.use(
           localStorage.removeItem(ADMIN_TOKEN_KEY);
           localStorage.removeItem('admin_user');
           localStorage.removeItem(`${ADMIN_TOKEN_KEY}_timestamp`);
-          window.location.href = '/admin/login';
+          // Let the login/reset forms handle their own 401 and show the API
+          // error. Redirecting here during login reloads the page before the
+          // error toast can render, making invalid credentials look ignored.
+          if (path !== '/admin/login' && !path.startsWith('/admin/reset-password')) {
+            window.location.href = '/admin/login';
+          }
         } else if (path.startsWith('/patients')) {
           localStorage.removeItem(PATIENT_TOKEN_KEY);
           localStorage.removeItem('patient_user');

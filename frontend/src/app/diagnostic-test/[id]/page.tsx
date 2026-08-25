@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Clock, Droplets, FlaskConical, CheckCircle2, ArrowLeft, Calendar, ArrowRight, Star } from 'lucide-react';
+import { Clock, Droplets, FlaskConical, ArrowLeft, Calendar, ArrowRight, Star } from 'lucide-react';
 import { FiCalendar, FiCreditCard, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import {
@@ -18,6 +18,7 @@ import { addToCart } from '@/lib/cart';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
 import { FALLBACK_LAB_TESTS } from '@/lib/diagnostic-data-fallback';
 
 function getSampleIcon(sampleType: string) {
@@ -270,14 +271,7 @@ export default function TestDetailPage() {
                     highlight="Conditions"
                     className="mb-4 md:mb-4"
                   />
-                  <div className="flex flex-wrap gap-2">
-                    {test.tags.map((tag) => (
-                      <span key={tag} className="inline-flex items-center gap-1.5 bg-primary-50 border border-primary-100 text-primary-800 text-sm font-medium px-3 py-1.5 rounded-full">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-primary-500" />
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  <IconTileList items={test.tags} category="diagnostic test related condition" accent="teal" layout="list" />
                 </motion.div>
               )}
 
@@ -295,24 +289,7 @@ export default function TestDetailPage() {
                     highlight={`(${test.includes.length})`}
                     className="mb-5 md:mb-5"
                   />
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {test.includes.map((item, i) => (
-                      <motion.div
-                        key={item}
-                        initial={{ opacity: 0, x: -8 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.04 }}
-                        className="group relative overflow-hidden flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-4 py-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-200 hover:bg-white hover:shadow-[0_14px_32px_-16px_rgba(1,173,165,0.35)]"
-                      >
-                        <span className="w-2 h-2 rounded-full bg-primary-400 flex-shrink-0" />
-                        <span className="text-sm text-neutral-700 font-medium">{item}</span>
-                        <svg viewBox="0 0 200 10" className="absolute inset-x-3 bottom-0 h-1.5 w-[calc(100%-1.5rem)] opacity-0 group-hover:opacity-25 transition-opacity" height="10" fill="none" aria-hidden="true">
-                          <path d="M0 7 H60 L68 2 L76 9 L82 4 L88 7 H200" stroke="rgba(1,173,165,0.5)" strokeWidth="1.5" />
-                        </svg>
-                      </motion.div>
-                    ))}
-                  </div>
+                  <IconTileList items={test.includes} category={`${test.name} included tests`} accent="teal" />
                 </motion.div>
               )}
 
@@ -329,26 +306,21 @@ export default function TestDetailPage() {
                   <FlaskConical className="w-5 h-5 text-primary-600" />
                   Patient Preparation
                 </h3>
-                <ul className="space-y-2 text-sm text-primary-800">
-                  {test.sampleType.toLowerCase().includes('blood') && (
-                    <li className="flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary-500 mt-1.5 flex-shrink-0" />
-                      Fasting for 8–10 hours recommended for most blood panels (water is fine)
-                    </li>
-                  )}
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary-500 mt-1.5 flex-shrink-0" />
-                    Bring any prior reports or prescriptions relevant to this test
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary-500 mt-1.5 flex-shrink-0" />
-                    Inform the staff about current medications before sample collection
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary-500 mt-1.5 flex-shrink-0" />
-                    Results expected in {test.turnaround} — digital report available via email
-                  </li>
-                </ul>
+                <IconTileList
+                  items={[
+                    ...(test.sampleType.toLowerCase().includes('blood')
+                      ? ['Fasting for 8–10 hours recommended for most blood panels (water is fine)']
+                      : []),
+                    'Bring any prior reports or prescriptions relevant to this test',
+                    'Inform the staff about current medications before sample collection',
+                    `Results expected in ${test.turnaround} — digital report available via email`,
+                  ]}
+                  category="diagnostic test patient preparation"
+                  accent="teal"
+                  layout="list"
+                  className="gap-2"
+                  itemClassName="min-h-[58px] rounded-2xl bg-white/75 p-2.5"
+                />
               </motion.div>
             </div>
 

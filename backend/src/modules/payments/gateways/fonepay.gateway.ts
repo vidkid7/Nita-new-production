@@ -40,7 +40,7 @@ export class FonepayGateway implements PaymentGateway {
       year: 'numeric',
     });
     const amount = Number(transaction.amount).toFixed(2);
-    const r1 = `Nita Clinics Payment - ${transaction.reference}`;
+    const r1 = `Nita Clinic Payment - ${transaction.reference}`;
     const r2 = 'nitaclinics.com';
 
     // DV hash field order per Fonepay spec: PID,MD,PRN,AMT,CRN,DT,R1,R2,RU

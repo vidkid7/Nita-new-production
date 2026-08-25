@@ -14,10 +14,10 @@ export const BRAND_COLORS = {
 } as const;
 
 export const BRAND = {
-  name: 'Nita Clinics',
+  name: 'Nita Clinic',
   tagline: 'Your Trusted Healthcare Partner',
-  logo: '/logo.png',
-  logoAlt: 'Nita Clinics Logo',
+  logo: '/images/nita-clinics-logo.png',
+  logoAlt: 'Nita Clinic Logo',
   phone: '+977-01-4533361',
   landline: '014533361',
   email: 'info@nitaclinics.com',
@@ -28,7 +28,7 @@ export const BRAND = {
   mapEmbed: 'https://www.google.com/maps?q=27.7002155,85.3459041&z=15&output=embed',
   whatsapp: '9779768523887',
   social: {
-    facebook: 'https://www.facebook.com/nitaclinics',
+    facebook: 'https://www.facebook.com/profile.php?id=61592513670112',
     instagram: '',
   },
   hours: {

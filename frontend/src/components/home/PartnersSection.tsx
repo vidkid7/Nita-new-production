@@ -19,7 +19,7 @@ const FALLBACK_PARTNERS = [
   {
     id: 'eng-nita',
     description: 'Engineering Nita Pvt. Ltd.',
-    image: 'https://engineeringnita.com/css/images/mainlogo.png',
+    image: '/images/nita-engineering-and-infra.jpeg',
     website: 'https://engineeringnita.com',
     className: LOGO_IMG_CLASS,
   },

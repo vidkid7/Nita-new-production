@@ -100,7 +100,7 @@ export class NotificationsService {
             <p>If you need to cancel or reschedule, please contact us at least 24 hours in advance.</p>
           </div>
           <div class="footer">
-            <p>Nita Clinics</p>
+            <p>Nita Clinic</p>
             <p>Kathmandu, Nepal | +977-1-XXXXXXX</p>
           </div>
         </div>
@@ -134,7 +134,7 @@ export class NotificationsService {
           </div>
           <div class="content">
             <p>Dear ${data.name},</p>
-            <p>Thank you for contacting Nita Clinics.</p>
+            <p>Thank you for contacting Nita Clinic.</p>
             <div class="highlight">
               <p><strong>Application Number:</strong> ${data.applicationNumber}</p>
               <p><strong>Service:</strong> ${data.programName}</p>
@@ -143,7 +143,7 @@ export class NotificationsService {
             <p>Our team will notify you via email with the next steps.</p>
           </div>
           <div class="footer">
-            <p>Nita Clinics</p>
+            <p>Nita Clinic</p>
             <p>Support Team | info@nitaclinics.com</p>
           </div>
         </div>

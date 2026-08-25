@@ -1,12 +1,12 @@
 'use client';
 
-import * as React from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Star, ArrowRight, Calendar, Phone, Award, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Calendar, Phone, Award, Clock, UserRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { getDoctorAvailability } from '@/lib/doctor-availability';
 
 export interface DoctorCardProps {
   images: string[];
@@ -22,6 +22,7 @@ export interface DoctorCardProps {
   bookingHref?: string;
   profileHref?: string;
   onViewProfile?: () => void;
+  isDoctor?: boolean;
   className?: string;
 }
 
@@ -58,14 +59,14 @@ export function DoctorCard({
   specialization,
   qualification,
   experience,
-  rating = 4.9,
-  availableDays = 'Mon – Fri',
+  availableDays,
   bio,
   phone,
   isTopRated = false,
   bookingHref = '/appointments/book',
   profileHref,
   onViewProfile,
+  isDoctor = true,
   className,
 }: DoctorCardProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -75,15 +76,15 @@ export function DoctorCard({
     setDirection(newDirection);
     setCurrentIndex((prev) => {
       const next = prev + newDirection;
-      if (next < 0) return images.length - 1;
-      if (next >= images.length) return 0;
+      if (next < 0) return safeImages.length - 1;
+      if (next >= safeImages.length) return 0;
       return next;
     });
   };
 
-  const safeImages = images.length > 0 ? images : [
-    'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80',
-  ];
+  const safeImages = images.filter(Boolean);
+  const hasImages = safeImages.length > 0;
+  const availability = getDoctorAvailability({ availableDays, bio });
 
   return (
     <motion.div
@@ -93,42 +94,43 @@ export function DoctorCard({
       transition={{ duration: 0.45 }}
       variants={contentVariants}
       whileHover={{
-        y: -6,
-        boxShadow: '0 24px 48px -12px var(--glow, rgba(1,173,165,0.3))',
-        transition: { type: 'spring', stiffness: 320, damping: 24 },
+        y: -3,
+        boxShadow: '0 18px 34px -20px rgba(1, 95, 90, 0.35)',
+        transition: { type: 'spring', stiffness: 320, damping: 26 },
       }}
-      style={{ '--glow': 'rgba(1,173,165,0.3)' } as React.CSSProperties}
       className={cn(
-        'group w-full overflow-hidden rounded-3xl border border-neutral-200/70 bg-white shadow-md cursor-pointer transition-all duration-500 hover:border-primary-200/70',
+        'group w-full overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-[0_10px_28px_-24px_rgba(15,23,42,0.5)] cursor-pointer transition-all duration-300 hover:border-primary-200',
         className
       )}
     >
-      {/* ── Image carousel (clinical monitor frame) ── */}
-      <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary-100 via-primary-50 to-teal-50">
-        <div className="absolute inset-0 plus-pattern opacity-25 pointer-events-none z-[1]" />
-        <AnimatePresence initial={false} custom={direction}>
-          <motion.img
-            key={currentIndex}
-            src={safeImages[currentIndex]}
-            alt={`Dr. ${name}`}
-            custom={direction}
-            variants={carouselVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: 'spring', stiffness: 300, damping: 30 },
-              opacity: { duration: 0.18 },
-            }}
-            className="absolute h-full w-full object-cover object-top"
-          />
-        </AnimatePresence>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary-950/60 via-transparent to-transparent z-[2]" />
-
-        {/* Ward number */}
-        <span className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/25 text-[11px] font-black tracking-wider text-white ring-1 ring-white/40 backdrop-blur-md">
-          01
-        </span>
+      {/* ── Image carousel / blank avatar ── */}
+      <div className="relative h-52 overflow-hidden border-b border-neutral-100 bg-primary-50/70">
+        {hasImages ? (
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.img
+              key={currentIndex}
+              src={safeImages[currentIndex]}
+              alt={`${isDoctor ? 'Dr. ' : ''}${name}`}
+              custom={direction}
+              variants={carouselVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: 'spring', stiffness: 300, damping: 30 },
+                opacity: { duration: 0.18 },
+              }}
+              className="absolute h-full w-full object-cover object-top"
+            />
+          </AnimatePresence>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center" aria-label="Profile image placeholder">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-primary-200 bg-white text-primary-600 shadow-sm">
+              <UserRound className="h-11 w-11 stroke-[1.2]" aria-hidden="true" />
+            </div>
+          </div>
+        )}
+        {hasImages && <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary-950/45 via-transparent to-transparent" />}
 
         {/* Navigation arrows (show on hover) */}
         {safeImages.length > 1 && (
@@ -150,23 +152,10 @@ export function DoctorCard({
           </div>
         )}
 
-        {/* Top badges */}
-        <div className="absolute top-3 left-3 flex gap-1.5 z-10">
-          <Badge className="bg-white/85 backdrop-blur-md text-primary-700 border-0 text-[10px] font-bold shadow-sm">
+        {/* Specialty label */}
+        <div className="absolute bottom-3 left-3 z-10">
+          <Badge className="border border-white/70 bg-white/90 text-[10px] font-bold text-primary-700 shadow-sm backdrop-blur-md">
             {specialization}
-          </Badge>
-          {isTopRated && (
-            <Badge className="bg-amber-400/90 backdrop-blur-sm text-amber-900 border-0 text-[10px] font-bold">
-              Top Rated
-            </Badge>
-          )}
-        </div>
-
-        {/* Rating badge */}
-        <div className="absolute top-3 right-3 z-10 hidden">
-          <Badge className="flex items-center gap-1 bg-white/80 backdrop-blur-sm text-neutral-700 border-0">
-            <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-            <span className="text-xs font-bold">{rating}</span>
           </Badge>
         </div>
 
@@ -187,40 +176,19 @@ export function DoctorCard({
           </div>
         )}
 
-        {/* Animated ECG trace */}
-        <svg
-          className="absolute inset-x-0 bottom-0 h-6 w-full z-[3]"
-          viewBox="0 0 400 24"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M0 18 H112 L128 6 L148 22 L166 12 L182 18 H400"
-            fill="none"
-            stroke="rgba(255,255,255,0.85)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray="60 15"
-            opacity="0.7"
-            className="animate-ecg-flow"
-          />
-        </svg>
       </div>
 
       {/* ── Content ── */}
-      <motion.div variants={contentVariants} className="p-5 space-y-3">
+      <motion.div variants={contentVariants} className="space-y-3 p-5">
         {/* Name + Top Rated */}
         <motion.div variants={itemVariants} className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="font-heading font-bold text-lg text-neutral-900 leading-tight">
-              Dr. {name}
+            <h3 className="font-heading text-lg font-bold leading-tight text-neutral-900">
+              {isDoctor ? 'Dr. ' : ''}{name}
             </h3>
-            <p className="text-primary-600 font-semibold text-sm mt-0.5">{specialization}</p>
+            <p className="mt-1 text-sm font-semibold text-primary-700">{specialization}</p>
           </div>
-          {isTopRated && (
-            <Award className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          )}
+          {isTopRated && <span className="rounded-full bg-primary-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-700">Featured</span>}
         </motion.div>
 
         {/* Qualification + Experience */}
@@ -229,7 +197,7 @@ export function DoctorCard({
             <Award className="w-3 h-3 text-primary-500" />
             {qualification}
           </span>
-          {experience !== undefined && (
+          {experience !== undefined && experience > 0 && (
             <span className="flex items-center gap-1 bg-neutral-50 border border-neutral-100 rounded-full px-2.5 py-1">
               <Clock className="w-3 h-3 text-teal-500" />
               {experience} yrs exp.
@@ -240,7 +208,7 @@ export function DoctorCard({
         {/* Availability */}
         <motion.div variants={itemVariants} className="flex items-center gap-2 text-xs text-neutral-600">
           <Calendar className="w-3.5 h-3.5 text-primary-400 flex-shrink-0" />
-          <span>Available: <span className="font-semibold text-neutral-800">{availableDays}</span></span>
+          <span>Available: <span className="font-semibold text-neutral-800">{availability}</span></span>
         </motion.div>
 
         {/* Bio */}

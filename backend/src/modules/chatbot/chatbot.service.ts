@@ -10,7 +10,7 @@ export class ChatbotService {
   private systemPrompt: string;
 
   constructor() {
-    this.systemPrompt = `You are a helpful assistant for Nita Clinics. Your role is to help:
+    this.systemPrompt = `You are a helpful assistant for Nita Clinic. Your role is to help:
     
 1. **Patients**: Answer questions about services, appointment booking, clinic timings, and general wellness queries.
 

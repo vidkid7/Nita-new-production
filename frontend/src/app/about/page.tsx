@@ -110,10 +110,10 @@ export default function AboutPage() {
   return (
     <>
       <PremiumLandingHero
-        eyebrow="About NITA Clinics · Kathmandu"
+        eyebrow="About NITA Clinic · Kathmandu"
         title="Specialist care with a"
         highlight="human, organized touch."
-        description="NITA Clinics brings consultations, lab tests, preventive check-ups, vaccination, and follow-up support together in one trusted healthcare destination."
+        description="NITA Clinic brings consultations, lab tests, preventive check-ups, vaccination, and follow-up support together in one trusted healthcare destination."
         videoSrc="/videos/hero/clinic-consultation.mp4"
         posterSrc="/videos/hero/clinic-consultation.jpg"
         overlayClassName="from-primary-950/[0.88] via-primary-900/[0.66] to-teal-900/[0.42]"
@@ -162,7 +162,7 @@ export default function AboutPage() {
               <div className="relative overflow-hidden rounded-3xl shadow-2xl border border-white/60 aspect-[4/3]">
                 <Image
                   src={mainImage}
-                  alt="Nita Clinics team"
+                  alt="Nita Clinic team"
                   fill
                   className="object-cover"
                 />
@@ -212,7 +212,7 @@ export default function AboutPage() {
                 className="mb-8"
               />
               <p className="text-neutral-600 mb-4">
-                Nita Clinics was established with a vision to provide accessible,
+                Nita Clinic was established with a vision to provide accessible,
                 affordable, and quality healthcare services to the people of Kathmandu.
               </p>
               <p className="text-neutral-600 mb-4">
@@ -392,7 +392,7 @@ export default function AboutPage() {
           <SectionHeader
             eyebrow="Virtual Tour"
             title="Take a look"
-            highlight="inside Nita Clinics"
+            highlight="inside Nita Clinic"
             subtitle="Experience our clinic facilities from the comfort of your home."
             className="mb-12 md:mb-14"
           />
@@ -444,7 +444,7 @@ export default function AboutPage() {
       <CTAFooter
         title="Ready to Visit Us?"
         highlight="book your appointment today"
-        subtitle="Experience quality care at Nita Clinics. Our team is ready to support your long-term health."
+        subtitle="Experience quality care at Nita Clinic. Our team is ready to support your long-term health."
         actions={[
           { label: 'Book Appointment', href: '/appointments/book' },
           { label: 'Call Now', href: 'tel:+977014533361' },

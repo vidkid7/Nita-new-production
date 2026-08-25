@@ -30,7 +30,7 @@ export class ReceiptService {
       providerTransactionId: transaction.providerTransactionId,
       isPaid: transaction.status === PaymentStatus.SUCCESS,
       clinic: {
-        name: 'Nita Clinics',
+        name: 'Nita Clinic',
         address: 'Birtamode-4, Jhapa, Nepal',
         phone: '+977-9768523887',
         email: 'info@nitaclinics.com',

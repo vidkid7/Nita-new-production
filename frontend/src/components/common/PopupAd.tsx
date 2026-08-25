@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Sparkles, Phone, Calendar, ArrowRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { BRAND } from '@/lib/brand';
 
 const STORAGE_KEY = 'nita-popup-ad-dismissed-v1';
 const SHOW_DELAY_MS = 2500; // show 2.5s after page load
@@ -108,6 +110,9 @@ export function PopupAd() {
 
               {/* Body */}
               <div className="relative p-5 sm:p-6 bg-gradient-to-br from-amber-50/60 via-white to-rose-50/60">
+                <div className="mb-4 inline-flex rounded-xl bg-white px-2.5 py-1.5 shadow-sm ring-1 ring-amber-100">
+                  <Image src={BRAND.logo} alt="Nita Clinic" width={132} height={64} className="h-8 w-auto object-contain" />
+                </div>
                 {/* Badge */}
                 <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-100 to-rose-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-800">
                   <span aria-hidden>🎉</span> Health Check-up Festival
@@ -118,21 +123,21 @@ export function PopupAd() {
                   id="popup-ad-title"
                   className="font-heading font-extrabold text-2xl sm:text-3xl leading-tight text-neutral-900"
                 >
-                  <span className="block text-amber-600">30% OFF</span>
-                  on all Health Check-up Packages
+                  <span className="block text-amber-600">Health packages</span>
+                  with clear tests and live offers
                 </h2>
 
                 {/* Sub */}
                 <p className="mt-2 text-sm text-neutral-600 leading-relaxed">
-                  Plus <strong className="text-emerald-600">Free Doctor Consultation</strong>{' '}
-                  with every package. Same-day reports. Book today — walk in tomorrow.
+                  Compare the current package catalogue by age and health goal. See every included
+                  test, the live offer price, and book directly with the clinic.
                 </p>
 
                 {/* Mini benefits row */}
                 <ul className="mt-4 grid grid-cols-2 gap-2 text-[11px] font-semibold text-neutral-700">
                   <li className="flex items-center gap-1.5">
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                    NABL-grade Lab
+                    Modern Laboratory
                   </li>
                   <li className="flex items-center gap-1.5">
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
@@ -156,7 +161,7 @@ export function PopupAd() {
                     className="group flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 px-4 py-3 text-sm font-bold text-white shadow-[0_10px_26px_-10px_rgba(244,63,94,0.7)] transition-all hover:shadow-[0_14px_30px_-10px_rgba(244,63,94,0.85)] hover:-translate-y-0.5"
                   >
                     <Calendar className="h-4 w-4" />
-                    Claim 30% OFF
+                    View Health Packages
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <a

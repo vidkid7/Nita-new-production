@@ -255,7 +255,7 @@ function ResetPasswordForm() {
         </div>
 
         <p className="text-center text-primary-200 text-sm mt-6">
-          &copy; {new Date().getFullYear()} Nita Clinics
+          &copy; {new Date().getFullYear()} Nita Clinic
         </p>
       </motion.div>
     </div>

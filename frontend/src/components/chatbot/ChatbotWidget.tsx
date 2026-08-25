@@ -24,7 +24,7 @@ export function ChatbotWidget() {
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! Welcome to Nita Clinics. How can I help you today?',
+      content: 'Hello! Welcome to Nita Clinic. How can I help you today?',
       timestamp: new Date(),
     },
   ]);
@@ -104,7 +104,7 @@ export function ChatbotWidget() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const simulatedResponses: Record<string, string> = {
         'How do I book an appointment?': 'You can book an appointment from the website by clicking "Book Appointment" in the menu, or call the clinic directly. You can choose your preferred specialist, date, and time slot.',
-        'What specialists are available?': 'Nita Clinics provides specialist consultations in areas such as gynecology, pediatrics, tuberculosis care, and general outpatient services. You can view the full team on the Team Members and Specialists pages.',
+        'What specialists are available?': 'Nita Clinic provides specialist consultations in areas such as gynecology, pediatrics, tuberculosis care, and general outpatient services. You can view the full team on the Team Members and Specialists pages.',
         'What are your working hours?': 'Our clinic hours may vary by service. Please check the Contact page for current timings or call us directly for urgent support.',
         'Services offered': 'We offer lab & service tests, check-up packages, vaccination services, specialist consultations, online consultations, home visits, and preventive healthcare plans including our health card benefits.',
       };
@@ -144,7 +144,7 @@ export function ChatbotWidget() {
       {
         id: '1',
         role: 'assistant',
-        content: 'Hello! Welcome to Nita Clinics. How can I help you today?',
+        content: 'Hello! Welcome to Nita Clinic. How can I help you today?',
         timestamp: new Date(),
       },
     ]);

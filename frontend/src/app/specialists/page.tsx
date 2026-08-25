@@ -21,6 +21,7 @@ interface ApiDoctor {
   photo?: string;
   experience?: number;
   phone?: string;
+  availableDays?: string;
 }
 
 const SPECIALTY_GROUPS = [
@@ -102,18 +103,17 @@ export default function SpecialistsPage() {
     }), [apiDoctors, apiLoaded]);
 
   function openDoctorModal(doc: Record<string, unknown>, images: string[]) {
-    const isFallback = 'images' in doc;
     setSelectedDoctor({
       name: doc.name as string,
       specialization: doc.specialization as string,
       qualification: (doc.qualification as string) || 'Specialist',
       experience: doc.experience as number | undefined,
       rating: (doc.rating as number) || 4.8,
-      availableDays: (doc.availableDays as string) || 'Mon – Fri',
+      availableDays: doc.availableDays as string | undefined,
       bio: doc.bio as string | undefined,
       phone: (doc.phone as string) || '+977 01-4533361',
       isTopRated: !!(doc.isTopRated as boolean),
-      images: isFallback ? (doc.images as string[]) : images,
+      images: [],
       bookingHref: `/appointments/book?doctor=${encodeURIComponent(doc.name as string)}&specialty=${encodeURIComponent(doc.specialization as string)}`,
       highlights: [(doc.specialization as string), (doc.qualification as string) || ''].filter(Boolean),
     });
@@ -222,12 +222,7 @@ export default function SpecialistsPage() {
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {(grp.doctors as (typeof grp.doctors)[number][]).map((doc, di) => {
-                    const isFallback = 'images' in doc;
-                    const images = isFallback
-                      ? (doc as { images: string[] }).images
-                      : (doc as ApiDoctor).photo
-                      ? [(doc as ApiDoctor).photo as string]
-                      : [];
+                    const images: string[] = [];
                     return (
                       <motion.div
                         key={doc.id}
@@ -243,7 +238,7 @@ export default function SpecialistsPage() {
                           qualification={(doc as { qualification?: string }).qualification || 'Specialist'}
                           experience={'experience' in doc ? (doc as { experience?: number }).experience : undefined}
                           rating={'rating' in doc ? (doc as { rating?: number }).rating : 4.8}
-                          availableDays={'availableDays' in doc ? (doc as { availableDays?: string }).availableDays : 'Mon – Fri'}
+                          availableDays={'availableDays' in doc ? (doc as { availableDays?: string }).availableDays : undefined}
                           bio={'bio' in doc ? (doc as { bio?: string }).bio : undefined}
                           phone={'phone' in doc ? (doc as { phone?: string }).phone : undefined}
                           isTopRated={'isTopRated' in doc ? !!(doc as { isTopRated?: boolean }).isTopRated : false}

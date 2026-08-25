@@ -12,8 +12,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import toast from 'react-hot-toast';
-import { get, post, getErrorMessage } from '@/lib/api';
-import axios from 'axios';
+import { get, post, getErrorMessage, uploadFile } from '@/lib/api';
 
 const doctorSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -88,23 +87,9 @@ export default function AddDoctorPage() {
       if (photoFile) {
         setIsUploadingPhoto(true);
         try {
-          const formData = new FormData();
-          formData.append('file', photoFile);
-          formData.append('folder', 'doctors');
+          const uploadResponse = await uploadFile('media/upload', photoFile, undefined, 'doctors');
 
-          const token = localStorage.getItem('admin_auth_token');
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-          const uploadResponse = await axios.post(
-            `${apiUrl}/api/v1/media/upload`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          photoUrl = uploadResponse.data.url;
+          photoUrl = uploadResponse.url;
           toast.success('Photo uploaded successfully');
         } catch (error: any) {
           toast.error(error.response?.data?.message || 'Failed to upload photo, but continuing...');

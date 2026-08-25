@@ -23,6 +23,7 @@ interface Doctor {
   isActive: boolean;
   email: string;
   phone: string;
+  availableDays?: string;
 }
 
 function fallbackToLocalDoctors(): Doctor[] {
@@ -42,10 +43,10 @@ function fallbackToLocalDoctors(): Doctor[] {
 
 const specializations = [
   'All',
+  'General Medicine',
   'Gynecology and Obstetrics',
   'Pediatrician',
-  'Tuberculosis',
-  'General Medicine',
+  'Tuberculosis (TB)',
   'Internal Medicine',
   'Preventive Care',
 ];
@@ -93,7 +94,7 @@ export default function DoctorsPage() {
       doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSpecialization =
       selectedSpecialization === 'All' ||
-      doctor.specialization === selectedSpecialization;
+      doctor.specialization.trim().toLowerCase() === selectedSpecialization.trim().toLowerCase();
     return matchesSearch && matchesSpecialization;
   });
 
@@ -102,7 +103,7 @@ export default function DoctorsPage() {
       <DoctorDetailModal doctor={selectedDoctor} onClose={() => setSelectedDoctor(null)} />
     <main>
       <PremiumLandingHero
-        eyebrow="Doctor Directory · NITA Clinics"
+        eyebrow="Doctor Directory · NITA Clinic"
         title="Meet the clinicians"
         highlight="behind your care."
         description="Search doctors by name or specialty, compare experience and qualification, then book the right appointment with confidence."
@@ -146,7 +147,7 @@ export default function DoctorsPage() {
               />
             </div>
             <div className="flex flex-wrap gap-2">
-              {specializations.slice(0, 5).map((spec) => (
+              {specializations.map((spec) => (
                 <button
                   key={spec}
                   onClick={() => setSelectedSpecialization(spec)}
@@ -193,16 +194,16 @@ export default function DoctorsPage() {
                   transition={{ delay: index * 0.05 }}
                 >
                   <DoctorCard
-                    images={doctor.photo ? [doctor.photo] : []}
+                    images={[]}
                     name={doctor.name}
                     specialization={doctor.specialization}
                     qualification={doctor.qualification || 'Specialist'}
                     experience={doctor.experience}
                     rating={4.8}
-                    availableDays={doctor.isActive ? 'Available Now' : 'By Appointment'}
+                    availableDays={doctor.availableDays}
                     bio={doctor.bio}
                     phone={doctor.phone}
-                    isTopRated={doctor.isActive}
+                    isTopRated={false}
                     bookingHref={`/appointments/book?doctor=${encodeURIComponent(doctor.name)}`}
                     onViewProfile={() =>
                       setSelectedDoctor({
@@ -211,11 +212,11 @@ export default function DoctorsPage() {
                         qualification: doctor.qualification || 'Specialist',
                         experience: doctor.experience,
                         rating: 4.8,
-                        availableDays: doctor.isActive ? 'Available Now' : 'By Appointment',
+                        availableDays: doctor.availableDays,
                         bio: doctor.bio,
                         phone: doctor.phone,
-                        isTopRated: doctor.isActive,
-                        images: doctor.photo ? [doctor.photo] : [],
+                        isTopRated: false,
+                        images: [],
                         bookingHref: `/appointments/book?doctor=${encodeURIComponent(doctor.name)}`,
                         highlights: [doctor.specialization, doctor.qualification || ''].filter(Boolean),
                       })

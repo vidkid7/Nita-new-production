@@ -34,7 +34,7 @@ export default function SettingsPage() {
 
   const [settings, setSettings] = useState({
     // General
-    siteName: 'Nita Clinics',
+    siteName: 'Nita Clinic',
     tagline: 'Your Health, Our Priority',
     siteDescription: 'Trusted clinic & lab care in Kathmandu with specialist services and modern lab facilities.',
     logo: '/logo.png',
@@ -52,16 +52,16 @@ export default function SettingsPage() {
     sundayHours: 'Closed',
 
     // Social Media
-    facebook: 'https://facebook.com/nitaclinics',
+    facebook: 'https://www.facebook.com/profile.php?id=61592513670112',
     instagram: 'https://instagram.com/nitaclinics',
     twitter: 'https://twitter.com/nitaclinics',
     linkedin: '',
     youtube: '',
 
     // SEO
-    metaTitle: 'Nita Clinics - Trusted Clinic & Lab Care in Kathmandu',
-    metaDescription: 'Nita Clinics provides specialist consultations, lab tests, and preventive healthcare in Kathmandu.',
-    metaKeywords: 'nita clinics, clinic, kathmandu, lab tests, health checkup, vaccination',
+    metaTitle: 'Nita Clinic - Trusted Clinic & Lab Care in Kathmandu',
+    metaDescription: 'Nita Clinic provides specialist consultations, lab tests, and preventive healthcare in Kathmandu.',
+    metaKeywords: 'nita clinic, clinic, kathmandu, lab tests, health checkup, vaccination',
   });
 
   // Load settings from database on mount

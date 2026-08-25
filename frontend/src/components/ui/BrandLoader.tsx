@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { BRAND } from '@/lib/brand';
 
 /**
- * Brand-themed loading screen for Nita Clinics.
+ * Brand-themed loading screen for Nita Clinic.
  *
  * Design uses pure CSS animations (keyframes) for everything — no framer-motion
  * dependency on the loader itself. The component always self-dismisses:
@@ -113,8 +114,8 @@ export function BrandLoader({
 
         <div className="brand-loader-logo relative mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-white p-5 shadow-[0_0_80px_-10px_rgba(93,225,216,0.55)] ring-1 ring-white/30">
           <Image
-            src="/logo.png"
-            alt="Nita Clinics"
+            src={BRAND.logo}
+            alt="Nita Clinic"
             width={96}
             height={96}
             priority

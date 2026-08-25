@@ -13,6 +13,7 @@ import { PatientPortalCTA, PatientPortalMobileRow } from '@/components/layout/Pa
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/hooks/useSettings';
 import { CartIconButton } from '@/components/cart/CartDrawer';
+import { BRAND } from '@/lib/brand';
 
 interface NavigationItem {
   name: string;
@@ -56,6 +57,9 @@ const navigation: NavigationItem[] = [
   { name: 'Health Card', href: '/health-card', badge: 'NEW' },
   { name: 'Our Team', href: '/team' },
 ];
+
+const mobileSubmenuId = (name: string) =>
+  `mobile-submenu-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
 export function Header() {
   const { settings } = useSettings();
@@ -157,7 +161,7 @@ export function Header() {
             >
               <div className="relative h-14 w-32 sm:w-36 xl:w-40">
                 <Image
-                  src="/logo.png"
+                  src={BRAND.logo}
                   alt="Nita Clinic — We Care Your Health"
                   fill
                   className="object-contain object-left transition-transform duration-500 group-hover:scale-[1.03]"
@@ -182,30 +186,51 @@ export function Header() {
                   onMouseEnter={() => item.children && handleDropEnter(item.name)}
                   onMouseLeave={handleDropLeave}
                 >
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      'inline-flex items-center gap-1 rounded-full px-2 xl:px-2.5 py-2 text-xs xl:text-sm font-semibold transition-all whitespace-nowrap',
-                      isActive
-                        ? 'bg-primary-600 text-white shadow-[0_12px_28px_-14px_rgba(1,173,165,0.95)]'
-                        : 'text-neutral-700 hover:bg-primary-50 hover:text-primary-800'
-                    )}
-                  >
-                    {item.name}
-                    {item.badge && (
-                      <span className="ml-0.5 text-[9px] bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-1.5 py-0.5 rounded-full leading-none font-bold animate-pulse">
-                        {item.badge}
-                      </span>
-                    )}
-                    {item.children && (
+                  {item.children ? (
+                    <button
+                      type="button"
+                      onClick={() => setActiveDropdown((prev) => prev === item.name ? null : item.name)}
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-full px-2 xl:px-2.5 py-2 text-xs xl:text-sm font-semibold transition-all whitespace-nowrap',
+                        isActive
+                          ? 'bg-primary-600 text-white shadow-[0_12px_28px_-14px_rgba(1,173,165,0.95)]'
+                          : 'text-neutral-700 hover:bg-primary-50 hover:text-primary-800'
+                      )}
+                      aria-expanded={activeDropdown === item.name}
+                      aria-haspopup="menu"
+                    >
+                      {item.name}
+                      {item.badge && (
+                        <span className="ml-0.5 text-[9px] bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-1.5 py-0.5 rounded-full leading-none font-bold animate-pulse">
+                          {item.badge}
+                        </span>
+                      )}
                       <FiChevronDown
                         className={cn(
                           'w-3.5 h-3.5 transition-transform duration-200',
                           activeDropdown === item.name && 'rotate-180'
                         )}
+                        aria-hidden="true"
                       />
-                    )}
-                  </Link>
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-full px-2 xl:px-2.5 py-2 text-xs xl:text-sm font-semibold transition-all whitespace-nowrap',
+                        isActive
+                          ? 'bg-primary-600 text-white shadow-[0_12px_28px_-14px_rgba(1,173,165,0.95)]'
+                          : 'text-neutral-700 hover:bg-primary-50 hover:text-primary-800'
+                      )}
+                    >
+                      {item.name}
+                      {item.badge && (
+                        <span className="ml-0.5 text-[9px] bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-1.5 py-0.5 rounded-full leading-none font-bold animate-pulse">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  )}
 
                   {/* Active page marker — pulsing “you are here” dot */}
                   {isActive && (
@@ -216,7 +241,7 @@ export function Header() {
                   {item.children && (
                     <AnimatePresence>
                       {activeDropdown === item.name && (
-                        <div className="absolute left-0 top-full z-50 w-64">
+                        <div className="absolute left-0 top-full z-50 w-64" role="menu">
                           <motion.div
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -300,14 +325,40 @@ export function Header() {
                   <PatientPortalMobileRow onNavigate={() => setIsMobileMenuOpen(false)} />
                 </div>
 
-                {navigation.map((item) => (
+                {navigation.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== '/' && pathname.startsWith(item.href + '/'));
+                  const isSubmenuOpen = openMobileSubmenu === item.name;
+                  const submenuId = mobileSubmenuId(item.name);
+
+                  return (
                   <div key={item.name}>
-                    <div className="flex items-center">
+                    {item.children ? (
+                      <button
+                        type="button"
+                        onClick={() => setOpenMobileSubmenu((prev) => prev === item.name ? null : item.name)}
+                        className={cn(
+                          'flex w-full items-center justify-between gap-2 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors',
+                          isActive
+                            ? 'bg-primary-50 text-primary-700 font-semibold'
+                            : 'text-neutral-700 hover:text-primary-700 hover:bg-primary-50'
+                        )}
+                        aria-expanded={isSubmenuOpen}
+                        aria-controls={submenuId}
+                      >
+                        <span>{item.name}</span>
+                        <FiChevronDown
+                          className={cn('w-4 h-4 shrink-0 text-neutral-400 transition-transform', isSubmenuOpen && 'rotate-180 text-primary-700')}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    ) : (
                       <Link
                         href={item.href}
                         className={cn(
-                          'flex-1 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
-                          pathname === item.href
+                          'flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
+                          isActive
                             ? 'bg-primary-50 text-primary-700 font-semibold'
                             : 'text-neutral-700 hover:text-primary-700 hover:bg-primary-50'
                         )}
@@ -319,28 +370,16 @@ export function Header() {
                           </span>
                         )}
                       </Link>
-                      {item.children && (
-                        <button
-                          onClick={() =>
-                            setOpenMobileSubmenu((prev) => prev === item.name ? null : item.name)
-                          }
-                          className="rounded-xl p-2 text-neutral-400 hover:bg-primary-50 hover:text-primary-700"
-                          aria-label={`Toggle ${item.name}`}
-                        >
-                          <FiChevronDown
-                            className={cn('w-4 h-4 transition-transform', openMobileSubmenu === item.name && 'rotate-180')}
-                          />
-                        </button>
-                      )}
-                    </div>
+                    )}
 
                     <AnimatePresence initial={false}>
-                      {item.children && openMobileSubmenu === item.name && (
+                      {item.children && isSubmenuOpen && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
                           className="ml-4 overflow-hidden"
+                          id={submenuId}
                         >
                           {item.children.map((child) => (
                             <Link
@@ -360,7 +399,8 @@ export function Header() {
                       )}
                     </AnimatePresence>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           )}

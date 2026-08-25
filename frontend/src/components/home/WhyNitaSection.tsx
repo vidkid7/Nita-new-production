@@ -21,8 +21,8 @@ import {
 const USP = [
   {
     icon: <ShieldCheck className="w-5 h-5" />,
-    title: 'Registered & Accredited',
-    desc: 'Government-registered clinic with an ISO-accredited pathology lab and modern lab equipment.',
+    title: 'Government Registered',
+    desc: 'Government-registered clinic with a modern in-house path lab and up-to-date lab equipment.',
     color: 'bg-primary-50 text-primary-600',
     bar: 'from-primary-400 to-primary-600',
     dot: 'bg-primary-500',
@@ -89,24 +89,6 @@ export function WhyNitaSection() {
             transition={{ duration: 0.55 }}
             className="relative w-full max-w-[480px]"
           >
-            {/* ISO accreditation glass badge — full width, just above the image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.4 }}
-              className="w-full flex items-center gap-3 rounded-2xl bg-white/90 backdrop-blur-xl shadow-xl p-4 border border-white/70 mb-4"
-            >
-              <div className="relative w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 animate-vital-ping" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-neutral-800">ISO Accredited</p>
-                <p className="text-[10px] text-neutral-500">Path Laboratory</p>
-              </div>
-            </motion.div>
-
             {/* main photo framed as a monitor screen */}
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] max-h-[600px] border border-white/60">
               {/* eslint-disable-next-line @next/next/no-img-element */}

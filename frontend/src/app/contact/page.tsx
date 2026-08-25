@@ -118,7 +118,7 @@ export default function ContactPage() {
   return (
     <>
       <PremiumLandingHero
-        eyebrow="Contact NITA Clinics"
+        eyebrow="Contact NITA Clinic"
         title="Questions, bookings,"
         highlight="and clinic support."
         description="Call, email, visit, or send a message. Our team can help with appointments, lab tests, health cards, vaccination, and general enquiries."

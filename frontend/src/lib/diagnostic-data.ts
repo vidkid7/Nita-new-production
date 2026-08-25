@@ -1,3 +1,5 @@
+import { LAB_PRICE_LIST_BY_SLUG } from './lab-price-list';
+
 /**
  * Types + helpers for lab tests. All catalog data is loaded from the API (`lab-tests`, `lab-tests/categories`).
  */
@@ -43,6 +45,21 @@ export function mapLabTestFromApi(raw: Record<string, unknown>): DiagnosticTest 
 
   const price = Number(raw.price ?? 0);
   const original = raw.originalPrice != null ? Number(raw.originalPrice) : price;
+  const slug = raw.slug != null ? String(raw.slug) : '';
+  const canonical = LAB_PRICE_LIST_BY_SLUG[slug];
+
+  // The workbook is the source of truth for the public catalogue. Preserve
+  // the API id, but do not let stale category names, prices, or fake discounts
+  // change what patients see.
+  if (canonical) {
+    return {
+      ...canonical,
+      id: String(raw.id),
+      categoryId: categoryId || undefined,
+      image: raw.image != null ? String(raw.image) : undefined,
+      isPopular: Boolean(raw.isPopular),
+    };
+  }
 
   const out: DiagnosticTest = {
     id: String(raw.id),
@@ -61,7 +78,7 @@ export function mapLabTestFromApi(raw: Record<string, unknown>): DiagnosticTest 
     tags: Array.isArray(raw.tags) ? (raw.tags as string[]) : [],
     includes: Array.isArray(raw.includes) ? (raw.includes as string[]) : [],
   };
-  if (raw.slug != null) out.slug = String(raw.slug);
+  if (slug) out.slug = slug;
   return out;
 }
 

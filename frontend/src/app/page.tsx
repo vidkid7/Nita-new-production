@@ -12,11 +12,11 @@ import { PartnersSection } from '@/components/home/PartnersSection';
 import { CTASection } from '@/components/home/CTASection';
 
 export const metadata: Metadata = {
-  title: 'Nita Clinics | Multi-Specialty Clinic — Kathmandu',
+  title: 'Nita Clinic | Multi-Specialty Clinic — Kathmandu',
   description:
-    'Nita Clinics provides specialist consultations, lab tests, check-up packages, vaccination, and preventive healthcare in Kathmandu, Nepal.',
+    'Nita Clinic provides specialist consultations, lab tests, check-up packages, vaccination, and preventive healthcare in Kathmandu, Nepal.',
   openGraph: {
-    title: 'Nita Clinics | Trusted Clinic in Kathmandu',
+    title: 'Nita Clinic | Trusted Clinic in Kathmandu',
     description: 'Specialist consultations, lab tests, check-ups and vaccination in Kathmandu.',
     images: ['/og-image.jpg'],
   },

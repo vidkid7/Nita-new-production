@@ -45,12 +45,11 @@ function img(slug: string, unsplashId: string) {
 }
 
 const LAB_CATS: Partial<LabTestCategory>[] = [
-  { name: "Women's Health", slug: 'womens-health', icon: '♀', color: 'bg-rose-500', order: 1, description: 'Hormonal & reproductive panels' },
-  { name: 'Heart & Lipid', slug: 'heart-lipid', icon: '❤️', color: 'bg-red-500', order: 2, description: 'Cardiac risk & lipids' },
-  { name: 'Diabetes & Metabolic', slug: 'diabetes-metabolic', icon: '🩸', color: 'bg-orange-500', order: 3, description: 'Glucose, thyroid & metabolic' },
-  { name: 'TB & Pulmonary', slug: 'tb-pulmonary', icon: '🫁', color: 'bg-emerald-600', order: 4, description: 'TB screening & lung health' },
-  { name: 'Liver & Kidney', slug: 'liver-kidney', icon: '🫀', color: 'bg-teal-600', order: 5, description: 'Organ function' },
-  { name: 'Imaging', slug: 'imaging', icon: '🩻', color: 'bg-primary-600', order: 6, description: 'Radiology & imaging' },
+  { name: 'Haematology', slug: 'haematology', icon: '🩸', color: 'bg-rose-600', order: 1, description: 'Blood counts and coagulation tests.' },
+  { name: 'Biochemistry', slug: 'biochemistry', icon: '🧪', color: 'bg-amber-500', order: 2, description: 'Sugar, kidney, liver, lipid and mineral tests.' },
+  { name: 'Serology', slug: 'serology', icon: '🛡️', color: 'bg-violet-600', order: 3, description: 'Blood group, antibody, antigen and infection screening.' },
+  { name: 'Microbiology', slug: 'microbiology', icon: '🔬', color: 'bg-emerald-600', order: 4, description: 'Stains and microscopy preparation tests.' },
+  { name: 'Parasitology', slug: 'parasitology', icon: '🧫', color: 'bg-lime-600', order: 5, description: 'Urine, stool and body-fluid analysis.' },
 ];
 
 const LAB_TESTS: Array<{
@@ -86,17 +85,49 @@ const LAB_TESTS: Array<{
   { slug: 'ecg', name: 'Resting ECG (12-lead)', catSlug: 'heart-lipid', price: 500, description: 'Electrocardiogram at rest.', turnaround: 'Same Day', sampleType: 'Non-invasive', tags: ['Heart'], includes: ['Cardiologist review if indicated'], imgKey: 'ecg', unsplash: 'photo-1628348066683-6931b3003fcb' }, // ECG/EKG
 ];
 
+// Authoritative rates from Price list for website.xlsx. This second, compact
+// definition is kept separate from the older seed block so existing database
+// history is not lost when this idempotent script is run again.
+const WORKBOOK_LAB_TESTS = [
+  ['hb', 'Hb', 'haematology', 150, 'Blood'], ['tc', 'TC', 'haematology', 150, 'Blood'], ['dc', 'DC', 'haematology', 150, 'Blood'],
+  ['platelets', 'Platelets', 'haematology', 150, 'Blood'], ['pcv-hct', 'PCV/HCT', 'haematology', 150, 'Blood'], ['esr', 'ESR', 'haematology', 100, 'Blood'],
+  ['bt', 'BT', 'haematology', 100, 'Blood'], ['ct', 'CT', 'haematology', 100, 'Blood'],
+  ['blood-sugar', 'Blood Sugar (F/PP/R)', 'biochemistry', 100, 'Blood'], ['rft', 'Renal Function Test (RFT)', 'biochemistry', 850, 'Blood'],
+  ['lft', 'Liver Function Test (LFT)', 'biochemistry', 900, 'Blood'], ['lipid-profile', 'Lipid Profile', 'biochemistry', 850, 'Blood'],
+  ['serum-uric-acid', 'Serum Uric Acid', 'biochemistry', 250, 'Blood'], ['serum-calcium', 'Serum Calcium', 'biochemistry', 400, 'Blood'],
+  ['blood-group-rh', 'Blood Grouping & Rh typing', 'serology', 100, 'Blood'], ['ra-factor', 'RA factor', 'serology', 300, 'Blood'],
+  ['crp', 'CRP', 'serology', 300, 'Blood'], ['aso', 'ASO', 'serology', 350, 'Blood'], ['widal-test', 'Widal Test', 'serology', 300, 'Blood'],
+  ['vdrl', 'VDRL', 'serology', 250, 'Blood'], ['hiv-rapid', 'HIV I & II Rapid Test', 'serology', 500, 'Blood'],
+  ['hbsag-rapid', 'HBsAg Rapid Test', 'serology', 500, 'Blood'], ['hcv-rapid', 'HCV Rapid Test', 'serology', 500, 'Blood'],
+  ['dengue-serology', 'Dengue IgG/IgM, NS1Ag', 'serology', 1300, 'Blood'], ['h-pylori-antigen', 'H.Pylori antigen stool', 'serology', 800, 'Stool'],
+  ['mp-ag', 'MP Ag', 'serology', 500, 'Blood'], ['gram-stain', 'Gram stain', 'microbiology', 250, 'Sample'],
+  ['afb-stain', 'AFB Stain', 'microbiology', 500, 'Sputum'], ['koh-preparation', 'KOH Preparation', 'microbiology', 200, 'Skin/Nail'],
+  ['urine-re', 'Urine R/E', 'parasitology', 100, 'Urine'], ['stool-re', 'Stool R/E', 'parasitology', 110, 'Stool'],
+  ['occult-blood', 'Occult Blood', 'parasitology', 250, 'Stool'], ['reducing-sugar', 'Reducing Sugar', 'parasitology', 150, 'Urine'],
+  ['semen-analysis', 'Semen Analysis', 'parasitology', 500, 'Semen'], ['urine-pregnancy-test', 'Urine Pregnancy Test', 'parasitology', 150, 'Urine'],
+] as const;
+
 const VACCINES_SEED: Partial<Vaccine>[] = [
-  { slug: 'flu-quadrivalent', name: 'Flu Vaccine – Quadrivalent', shortName: 'Influenza', category: ['Adults', 'Children', 'Seniors'], tagline: 'Annual seasonal flu protection', description: 'Covers four influenza strains; recommended yearly.', longDescription: 'Seasonal quadrivalent influenza vaccine updated each year.', image: img('flu', 'photo-1576091160550-2173dba999ef'), whoItIsFor: '6 months and older', schedule: 'Once yearly', doses: '1 dose (2 for some children)', protectsAgainst: ['Influenza A/B strains'], sideEffects: ['Arm soreness', 'Mild fever'], contraindications: ['Severe allergy to components'], availability: 'Seasonal', priceNote: 'Contact clinic', order: 1 },
-  { slug: 'hepatitis-b', name: 'Hepatitis B Vaccine', shortName: 'Hep B', category: ['Adults', 'Children'], tagline: 'Prevent chronic HBV', description: 'Highly effective 3-dose series.', image: img('hep-b', 'photo-1628771065518-0d82f1938462'), whoItIsFor: 'All unvaccinated individuals', schedule: '0, 1, 6 months', doses: '3 doses', protectsAgainst: ['Hepatitis B'], sideEffects: ['Injection site soreness'], contraindications: ['Severe prior reaction'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 2 },
-  { slug: 'tdap', name: 'Tdap Booster', shortName: 'Tdap', category: ['Adults', 'Women'], tagline: 'Diphtheria, tetanus, pertussis', description: 'Adolescent and adult booster.', image: img('tdap', 'photo-1559757175-0eb30cd8c063'), whoItIsFor: 'Adults; pregnant women 28–36 wk', schedule: 'Every 10 years', doses: '1 dose', protectsAgainst: ['Diphtheria', 'Tetanus', 'Pertussis'], sideEffects: ['Sore arm', 'Fatigue'], contraindications: ['Encephalopathy after prior dose'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 3 },
-  { slug: 'hepatitis-a', name: 'Hepatitis A Vaccine', shortName: 'Hep A', category: ['Adults', 'Travel'], tagline: 'Food & water borne liver infection', description: 'Two-dose long-term protection.', image: img('hep-a', 'photo-1582719471384-894fbb16e074'), whoItIsFor: 'Travellers, food handlers', schedule: '0 and 6–12 months', doses: '2 doses', protectsAgainst: ['Hepatitis A'], sideEffects: ['Mild local reaction'], contraindications: ['Severe illness'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 4 },
-  { slug: 'cholera', name: 'Cholera Vaccine (Oral)', shortName: 'Cholera', category: ['Travel'], tagline: 'Travel to endemic areas', description: 'Oral cholera vaccination.', image: img('cholera', 'photo-1584308666744-24d5c474f2ae'), whoItIsFor: 'Travellers', schedule: 'Per manufacturer', doses: '2 oral doses', protectsAgainst: ['V. cholerae O1'], sideEffects: ['GI upset'], contraindications: ['Acute GI illness'], availability: 'On Request', priceNote: 'Contact clinic', order: 5 },
-  { slug: 'hpv', name: 'HPV Vaccine', shortName: 'HPV', category: ['Women', 'Adults'], tagline: 'Cervical cancer prevention', description: 'Gardasil / equivalent as available.', image: img('hpv', 'photo-1579684385127-1ef15d508118'), whoItIsFor: 'Per national schedule', schedule: '2 or 3 doses', doses: 'Per age', protectsAgainst: ['HPV types in vaccine'], sideEffects: ['Local reaction'], contraindications: ['Pregnancy'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 6 },
-  { slug: 'mmr', name: 'MMR Vaccine', shortName: 'MMR', category: ['Children', 'Adults'], tagline: 'Measles, mumps, rubella', description: 'Live attenuated combination vaccine.', image: img('mmr', 'photo-1503454537195-1dcabb73ffb9'), whoItIsFor: 'Per national immunization schedule', schedule: '1–2 doses', doses: '1–2 doses', protectsAgainst: ['Measles', 'Mumps', 'Rubella'], sideEffects: ['Fever', 'Rash (rare)'], contraindications: ['Pregnancy', 'Severe immunosuppression'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 7 },
-  { slug: 'typhoid', name: 'Typhoid Vaccine', shortName: 'Typhoid', category: ['Travel', 'Adults'], tagline: 'Enteric fever prevention', description: 'Injectable or oral per availability.', image: img('typhoid', 'photo-1584036561566-baf8f0f1b144'), whoItIsFor: 'Endemic areas, travellers', schedule: 'Per product', doses: '1–4 doses (oral) or 1 (injectable)', protectsAgainst: ['Salmonella Typhi'], sideEffects: ['Fever', 'Headache'], contraindications: ['Acute illness'], availability: 'On Request', priceNote: 'Contact clinic', order: 8 },
-  { slug: 'pneumococcal', name: 'Pneumococcal Vaccine', shortName: 'PCV/PPSV', category: ['Adults', 'Seniors', 'Children'], tagline: 'Pneumonia prevention', description: 'Conjugate or polysaccharide per age and risk.', image: img('pneumo', 'photo-1551601651-2a8555f1a136'), whoItIsFor: 'Infants, elderly, high-risk adults', schedule: 'Per schedule', doses: '1–4 doses', protectsAgainst: ['Streptococcus pneumoniae (covered serotypes)'], sideEffects: ['Local soreness', 'Fever'], contraindications: ['Severe allergy to vaccine'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 9 },
-  { slug: 'varicella', name: 'Varicella (Chickenpox) Vaccine', shortName: 'Varicella', category: ['Children', 'Adults'], tagline: 'Chickenpox protection', description: 'Live vaccine for varicella-zoster virus.', image: img('varicella', 'photo-1511895426328-dc8714191300'), whoItIsFor: 'Unvaccinated children and susceptible adults', schedule: '2 doses', doses: '2 doses', protectsAgainst: ['Varicella (chickenpox)'], sideEffects: ['Mild rash', 'Fever'], contraindications: ['Pregnancy', 'Immunosuppression'], availability: 'On Request', priceNote: 'Contact clinic', order: 10 },
+  { slug: 'tetanus-toxoid-tt', name: 'Tetanus Toxoid (T.T)', shortName: 'T-T', category: ['Adults', 'Women'], tagline: 'Tetanus protection & wound prevention', description: 'Tetanus toxoid vaccine for adults and during pregnancy.', longDescription: 'Tetanus toxoid (T-T) protects against tetanus, a serious bacterial infection caused by Clostridium tetani that enters the body through wounds. The vaccine is given as a booster every 10 years for adults and is routinely recommended during each pregnancy (ideally between 27–36 weeks) to protect the newborn through maternal antibody transfer.', image: img('tetanus-toxoid-tt', 'photo-1559757175-0eb30cd8c063'), whoItIsFor: 'Adults; pregnant women (27–36 wks)', schedule: 'Every 10 years; each pregnancy', doses: '1 dose', protectsAgainst: ['Tetanus (lockjaw)'], sideEffects: ['Arm soreness', 'Mild fever', 'Fatigue'], contraindications: ['Severe allergy to a previous dose'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 1 },
+  { slug: 'influenza-vaccine', name: 'Influenza Vaccine', shortName: 'Influenza', category: ['Adults', 'Children', 'Seniors'], tagline: 'Annual seasonal flu protection', description: 'Yearly flu shot covering current circulating strains.', longDescription: 'The seasonal influenza vaccine is updated each year to protect against the influenza virus strains expected to circulate. Annual vaccination is recommended for everyone 6 months and older, and is especially important for older adults, young children, pregnant women, and people with chronic conditions such as asthma, diabetes, or heart disease. Get vaccinated before the flu season peaks to reduce the risk of severe illness and complications.', image: img('influenza-vaccine', 'photo-1576091160550-2173dba999ef'), whoItIsFor: '6 months and older', schedule: 'Once yearly', doses: '1 dose (2 for some children)', protectsAgainst: ['Seasonal influenza A/B strains'], sideEffects: ['Arm soreness', 'Mild fever', 'Body aches'], contraindications: ['Severe allergy to vaccine components'], availability: 'Seasonal', priceNote: 'Contact clinic', order: 2 },
+  { slug: 'pneumococcal-vaccine', name: 'Pneumococcal Vaccine', shortName: 'Pneumococcal', category: ['Adults', 'Seniors', 'Children'], tagline: 'Pneumonia & invasive disease prevention', description: 'Conjugate or polysaccharide vaccine per age and risk.', longDescription: 'The pneumococcal vaccine protects against Streptococcus pneumoniae, a leading cause of pneumonia, meningitis, and bloodstream infections. It is recommended for infants, adults over 65, and individuals with chronic illnesses or weakened immune systems. The conjugate (PCV) and polysaccharide (PPSV) formulations are used per age and clinical indication.', image: img('pneumococcal-vaccine', 'photo-1551601651-2a8555f1a136'), whoItIsFor: 'Infants, elderly (65+), high-risk adults', schedule: 'Per age and risk-based schedule', doses: '1–4 doses', protectsAgainst: ['Streptococcus pneumoniae (covered serotypes)'], sideEffects: ['Injection site soreness', 'Mild fever'], contraindications: ['Severe allergy to a previous dose or component'], availability: 'Available in Clinic', priceNote: 'Contact clinic', order: 3 },
+];
+
+/** Vaccines that are no longer offered — kept here so we can mark them inactive on re-seed. */
+const RETIRED_VACCINE_SLUGS = [
+  'flu-quadrivalent',
+  'hepatitis-b',
+  'tdap',
+  'hepatitis-a',
+  'cholera',
+  'hpv',
+  'mmr',
+  'typhoid',
+  'varicella',
+  // Defensive: slugs from earlier short-name variants should the data ever be reseeded
+  'tetanus-toxoid',
+  'influenza',
+  'pneumococcal',
 ];
 
 const PACKAGES_SEED: Partial<CheckupPackage>[] = [
@@ -125,7 +156,7 @@ const HEALTH_CARD_SEED: Array<{
 }> = [
   { type: HealthCardCategoryType.LICENSED_DOCTORS, name: "Doctors' Card", opdDiscount: '100% Free OPD', labDiscount: '50% Off lab tests', medicineDiscount: '10% Off pharmacy', queueBenefit: 'Priority queue', summary: 'Licensed medical practitioners', notes: 'NMC registration required.', order: 1, imgKey: 'hc-doctors', unsplash: 'photo-1576091160399-112ba8d25d1d' },
   { type: HealthCardCategoryType.FAMILY, name: "Doctor's Family", opdDiscount: '50% Off OPD', labDiscount: '35% Off lab', medicineDiscount: '10% Off pharmacy', queueBenefit: 'Priority access', summary: 'Spouse, parents, children', notes: 'Eligibility verified on application.', order: 2, imgKey: 'hc-family', unsplash: 'photo-1511895426328-dc8714191300' },
-  { type: HealthCardCategoryType.PARTNER_STAFF, name: 'Partner Staff', opdDiscount: 'Corporate OPD rate', labDiscount: 'Discounted labs', medicineDiscount: 'Discounted medicines', queueBenefit: 'Priority queue', summary: 'Partner organizations', notes: 'Employer verification.', order: 3, imgKey: 'hc-partner', unsplash: 'photo-1521737711867-e3b97375f902' },
+  { type: HealthCardCategoryType.PARTNER_STAFF, name: 'Partner Staff', opdDiscount: '50% off', labDiscount: '50% Off lab tests', medicineDiscount: '10% Off pharmacy', queueBenefit: 'Priority queue', summary: 'Staff of Nita Group partner organisations', notes: 'Employer verification required. Valid ID from the partner organisation needed at enrolment.', order: 3, imgKey: 'hc-partner', unsplash: 'photo-1521737711867-e3b97375f902' },
   { type: HealthCardCategoryType.GENERAL_PUBLIC, name: 'General Public', opdDiscount: 'Queue benefits', labDiscount: '10–20% selected tests', medicineDiscount: '5–10% pharmacy', queueBenefit: 'Queue skip + rates', summary: 'Open to everyone', notes: 'Apply online or at reception.', order: 4, imgKey: 'hc-public', unsplash: 'photo-1571019613454-1cb2f99b2d8b' },
 ];
 
@@ -180,9 +211,9 @@ const BLOG_CONTENT_SEED: Array<{
 <p>Drink boiled or purified water, wash fruits and vegetables well, and prefer freshly cooked meals. Avoid street drinks and raw salads from unknown vendors when hygiene is uncertain.</p>
 <h2>Vector-borne illness</h2>
 <p>Empty containers that collect rainwater, use mosquito nets, and seek care early for fever with body aches or rash.</p>
-<p>Visit Nita Clinics for vaccines, lab tests, or if symptoms persist — our team is here to help.</p>`,
+<p>Visit Nita Clinic for vaccines, lab tests, or if symptoms persist — our team is here to help.</p>`,
     featuredImage: 'https://images.unsplash.com/photo-1576671081837-49000212a370?w=1200&q=85',
-    author: 'Dr. Nita Clinics Team',
+    author: 'Dr. Nita Clinic Team',
     category: 'Preventive Health',
     tags: ['monsoon', 'prevention', 'Nepal'],
     isPublished: true,
@@ -197,9 +228,9 @@ const BLOG_CONTENT_SEED: Array<{
 <p>Include vegetables, adequate protein, and whole grains; limit sugary drinks and ultra-processed snacks.</p>
 <h2>Sleep and stress</h2>
 <p>Regular sleep patterns and simple stress-reduction techniques support blood pressure and glucose control.</p>
-<p>Book a check-up or lab package at Nita Clinics to monitor lipids, glucose, and blood pressure with your clinician.</p>`,
+<p>Book a check-up or lab package at Nita Clinic to monitor lipids, glucose, and blood pressure with your clinician.</p>`,
     featuredImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=85',
-    author: 'Dr. Nita Clinics Team',
+    author: 'Dr. Nita Clinic Team',
     category: 'Heart Health',
     tags: ['heart health', 'diabetes', 'check-up'],
     isPublished: true,
@@ -307,15 +338,78 @@ async function main() {
     }
   }
 
+  for (const [slug, name, catSlug, price, sampleType] of WORKBOOK_LAB_TESTS) {
+    const cat = catBySlug.get(catSlug);
+    if (!cat) continue;
+    let row = await qt.findOne({ where: { slug } });
+    const payload = {
+      name,
+      slug,
+      categoryId: cat.id,
+      description: `${name} laboratory test.`,
+      longDescription: undefined,
+      price,
+      originalPrice: price,
+      image: img(`lab-${slug}`, 'photo-1576091160550-2173dba999ef'),
+      turnaround: 'Same day',
+      sampleType,
+      isPopular: false,
+      tags: [],
+      includes: [],
+      isActive: true,
+      order: 0,
+    };
+    if (!row) {
+      row = qt.create(payload);
+    } else {
+      Object.assign(row, payload);
+    }
+    await qt.save(row);
+  }
+
+  await qt
+    .createQueryBuilder()
+    .update()
+    .set({ isActive: false })
+    .where('slug NOT IN (:...slugs)', { slugs: WORKBOOK_LAB_TESTS.map(([slug]) => slug) })
+    .andWhere('isActive = :active', { active: true })
+    .execute();
+
+  await qc
+    .createQueryBuilder()
+    .update()
+    .set({ isActive: false })
+    .where('slug NOT IN (:...slugs)', { slugs: LAB_CATS.map((category) => category.slug) })
+    .andWhere('isActive = :active', { active: true })
+    .execute();
+
   for (const v of VACCINES_SEED) {
     let row = await vv.findOne({ where: { slug: v.slug } });
     if (!row) {
+      // Brand-new vaccine: insert with full seed content.
       row = vv.create({ ...v, isActive: true } as Vaccine);
       await vv.save(row);
     } else {
-      Object.assign(row, v);
-      await vv.save(row);
+      // Existing vaccine: ONLY ensure it's active. Don't overwrite the
+      // production copy (descriptions, pricing, images) — admins may have
+      // edited it via the dashboard.
+      if (!row.isActive) {
+        row.isActive = true;
+        await vv.save(row);
+      }
     }
+  }
+
+  // Deactivate any retired vaccine so it no longer appears in the public catalog.
+  // We keep the row in the DB (history, references) but flip isActive off.
+  if (RETIRED_VACCINE_SLUGS.length > 0) {
+    await vv
+      .createQueryBuilder()
+      .update()
+      .set({ isActive: false })
+      .where('slug IN (:...slugs)', { slugs: RETIRED_VACCINE_SLUGS })
+      .andWhere('isActive = :active', { active: true })
+      .execute();
   }
 
   for (const p of PACKAGES_SEED) {
@@ -361,7 +455,7 @@ async function main() {
     specialization: string;
     staffType: StaffType;
     experience: number;
-    photo: string;
+    photo: string | null;
     bio: string;
     deptSlug: string;
     consultationFee: number;
@@ -376,7 +470,7 @@ async function main() {
       specialization: 'General Medicine & Diabetes',
       staffType: StaffType.DOCTOR,
       experience: 18,
-      photo: img('team-dr-anil', 'photo-1559839734-2b71ea197ec2'),
+      photo: null,
       bio: 'Seed profile — replace with your lead physician details in Admin.',
       deptSlug: 'general-medicine',
       consultationFee: 1500,
@@ -389,7 +483,7 @@ async function main() {
       specialization: 'Child Health & Immunization',
       staffType: StaffType.DOCTOR,
       experience: 12,
-      photo: img('team-dr-priya', 'photo-1503454537195-1dcabb73ffb9'),
+      photo: null,
       bio: 'Seed profile — edit photo, bio, and fee in Admin.',
       deptSlug: 'pediatrics',
       consultationFee: 1200,
@@ -402,7 +496,7 @@ async function main() {
       specialization: "Obstetrics & Gynecology",
       staffType: StaffType.DOCTOR,
       experience: 14,
-      photo: img('team-dr-sunita', 'photo-1559757148-5c350d0d3c56'),
+      photo: null,
       bio: 'Seed profile — update in Admin under Doctors.',
       deptSlug: 'gynecology',
       consultationFee: 1500,
@@ -415,7 +509,7 @@ async function main() {
       specialization: 'Laboratory Services',
       staffType: StaffType.TECHNICIAN,
       experience: 9,
-      photo: img('team-lab-ramesh', 'photo-1576091160550-2173dba999ef'),
+      photo: null,
       bio: 'Seed lab team member — edit in Admin.',
       deptSlug: 'laboratory',
       consultationFee: 0,
@@ -428,7 +522,7 @@ async function main() {
       specialization: 'OPD Nursing',
       staffType: StaffType.NURSE,
       experience: 7,
-      photo: img('team-nurse-sita', 'photo-1571019614242-c5c5dee9f902'),
+      photo: null,
       bio: 'Seed nursing staff — edit in Admin.',
       deptSlug: 'general-medicine',
       consultationFee: 0,
@@ -441,7 +535,7 @@ async function main() {
       specialization: 'Front Desk & Billing',
       staffType: StaffType.ADMIN_STAFF,
       experience: 5,
-      photo: img('team-admin-kiran', 'photo-1521737711867-e3b97375f902'),
+      photo: null,
       bio: 'Seed admin staff — edit in Admin.',
       deptSlug: 'general-medicine',
       consultationFee: 0,

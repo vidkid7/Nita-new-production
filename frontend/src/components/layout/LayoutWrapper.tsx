@@ -6,7 +6,6 @@ import { Footer } from './Footer';
 import { LiquidBackdrop } from '@/components/ui/LiquidBackdrop';
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 import { ChatbotWidget } from '@/components/chatbot/ChatbotWidget';
-import { PopupAd } from '@/components/common/PopupAd';
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -28,7 +27,6 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       <Footer />
       <WhatsAppButton />
       <ChatbotWidget />
-      <PopupAd />
     </>
   );
 }

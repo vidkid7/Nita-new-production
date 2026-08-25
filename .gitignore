@@ -44,3 +44,18 @@ Thumbs.db
 jwt_secret.*
 .vercel
 .env*
+
+# Logs and runtime artifacts
+*.err
+*.err.log
+railway-*.txt
+backend.err.log
+backend.log
+frontend-err.log
+frontend.log
+
+# Local database backups
+*.dump
+
+# Command Code local state
+.commandcode/

@@ -23,6 +23,7 @@ import {
 import { PremiumLandingHero } from '@/components/ui/PremiumLandingHero';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
 import { FiCalendar, FiPhone } from 'react-icons/fi';
 
 const CHANNELS = [
@@ -33,7 +34,7 @@ const CHANNELS = [
     tagline: 'Pick up at the clinic counter',
     price: 'Same-day',
     description:
-      'Bring your prescription to the Nita Clinics counter in Bhimselgola-9. Our pharmacist dispenses, double-checks dosage and interactions, and explains the schedule on the spot.',
+      'Bring your prescription to the Nita Clinic counter in Bhimselgola-9. Our pharmacist dispenses, double-checks dosage and interactions, and explains the schedule on the spot.',
     features: [
       'Counter pickup during clinic hours',
       'Pharmacist medication review',
@@ -135,7 +136,7 @@ export default function PharmacyPage() {
   return (
     <main>
       <PremiumLandingHero
-        eyebrow="Pharmacy · Nita Clinics"
+        eyebrow="Pharmacy · Nita Clinic"
         title="The pharmacy that"
         highlight="comes to you."
         description="Pick up your medicines at the clinic counter or get them delivered to your home. Pharmacist-reviewed, cold-chain safe, and priced transparently — so the only thing you worry about is getting better."
@@ -178,7 +179,7 @@ export default function PharmacyPage() {
             eyebrow="Two ways to get your medicines"
             title="Pick up, or"
             highlight="let us deliver."
-            subtitle="Both channels use the same Nita Clinics pharmacy, the same pharmacist, the same batch tracking — and the same transparent NRP pricing."
+            subtitle="Both channels use the same Nita Clinic pharmacy, the same pharmacist, the same batch tracking — and the same transparent NRP pricing."
             className="mb-12"
           />
 
@@ -205,14 +206,14 @@ export default function PharmacyPage() {
                   <p className="mt-1 text-sm font-semibold text-primary-700">{c.tagline}</p>
                   <p className="mt-3 text-sm text-neutral-600 leading-relaxed">{c.description}</p>
 
-                  <ul className="mt-4 space-y-1.5">
-                    {c.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-neutral-600">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-500" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <IconTileList
+                    items={c.features}
+                    category={`${c.title} pharmacy service features`}
+                    accent="teal"
+                    layout="list"
+                    className="mt-5 gap-2"
+                    itemClassName="rounded-2xl p-3"
+                  />
 
                   <div className="mt-5 flex items-center justify-between border-t border-neutral-100 pt-4">
                     <span className="text-xs font-semibold text-neutral-500">{c.price}</span>
@@ -315,24 +316,19 @@ export default function PharmacyPage() {
                 Drop your prescription details below and a pharmacist will call you back within 30 minutes
                 to confirm the order and delivery slot. Same-day delivery in Kathmandu Valley.
               </p>
-              <ul className="mt-6 space-y-2 text-sm text-neutral-700">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500" />
-                  Kathmandu Valley: same-day if ordered before 2 pm
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500" />
-                  Lalitpur / Bhaktapur: next-day
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500" />
-                  Cold-chain items handled with insulated bags
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500" />
-                  Free pharmacist call-back before dispatch
-                </li>
-              </ul>
+              <IconTileList
+                items={[
+                  'Kathmandu Valley: same-day if ordered before 2 pm',
+                  'Lalitpur / Bhaktapur: next-day',
+                  'Cold-chain items handled with insulated bags',
+                  'Free pharmacist call-back before dispatch',
+                ]}
+                category="pharmacy delivery information"
+                accent="teal"
+                layout="list"
+                className="mt-6 gap-2"
+                itemClassName="rounded-2xl p-3"
+              />
             </div>
 
             <form
@@ -422,7 +418,7 @@ export default function PharmacyPage() {
                     <ArrowRight className="h-4 w-4" />
                   </button>
                   <p className="text-[11px] text-neutral-500 text-center">
-                    By submitting, you agree to be contacted by a Nita Clinics pharmacist.
+                    By submitting, you agree to be contacted by a Nita Clinic pharmacist.
                   </p>
                 </div>
               )}

@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FiCreditCard, FiArrowLeft, FiCheckCircle, FiClock, FiXCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiCreditCard, FiArrowLeft, FiCheckCircle, FiClock, FiXCircle, FiAlertCircle, FiPrinter, FiDownload } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { get, getErrorMessage } from '@/lib/api';
+import { HealthCard } from '@/components/health-card/HealthCard';
 
 interface HealthCardApplication {
   id: string;
@@ -25,6 +26,8 @@ interface HealthCardApplication {
   rejectionReason?: string;
   createdAt: string;
   isCollected?: boolean;
+  documentNumber?: string;
+  nmcRegistrationId?: string;
 }
 
 function formatHolderLabel(t?: string) {
@@ -62,7 +65,7 @@ export default function MyHealthCardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-gradient-to-b from-neutral-50 via-white to-neutral-50">
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/patients/dashboard" className="text-neutral-500 hover:text-primary-600">
@@ -84,7 +87,7 @@ export default function MyHealthCardPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {applications.map((app) => {
               const displayStatus =
                 app.isCollected && app.status === 'approved' ? 'collected' : app.status;
@@ -94,65 +97,113 @@ export default function MyHealthCardPage() {
                   label: app.status,
                   color: 'bg-neutral-100 text-neutral-600',
                 };
-              const displayName = app.fullName || app.applicantName || app.name;
+              const isActive = app.status === 'approved' || displayStatus === 'collected';
               return (
-                <div key={app.id} className="bg-white rounded-xl shadow-soft p-6">
-                  <div className="flex items-start justify-between gap-4 mb-4">
+                <div key={app.id} className="bg-white rounded-2xl shadow-lg shadow-neutral-900/5 border border-neutral-100 overflow-hidden">
+                  {/* Header */}
+                  <div className="px-6 py-5 flex items-start justify-between gap-4 border-b border-neutral-100">
                     <div className="flex items-center gap-3">
-                      {info.icon}
+                      <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
+                        {info.icon}
+                      </div>
                       <div>
-                        <p className="font-semibold text-neutral-900">
+                        <p className="font-bold text-neutral-900">
                           {formatHolderLabel(app.holderType || app.cardType)}
                         </p>
-                        <p className="text-sm text-neutral-500">
+                        <p className="text-xs text-neutral-500 mt-0.5">
                           Applied {format(new Date(app.createdAt), 'MMM d, yyyy')}
+                          {isActive && app.validUntil && (
+                            <> · Valid until {format(new Date(app.validUntil), 'MMM yyyy')}</>
+                          )}
                         </p>
                       </div>
                     </div>
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${info.color}`}>
+                    <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${info.color}`}>
                       {info.label}
                     </span>
                   </div>
 
-                  {app.status === 'approved' || displayStatus === 'collected' ? (
-                    <div className="bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl p-4 text-white">
-                      <p className="text-xs font-medium opacity-75 mb-1">NITA CLINICS HEALTH CARD</p>
-                      {app.cardNumber && (
-                        <p className="font-mono text-lg font-bold tracking-widest mb-2">{app.cardNumber}</p>
-                      )}
-                      <p className="text-sm font-medium">{displayName}</p>
-                      {app.validUntil && (
-                        <p className="text-xs opacity-75 mt-1">
-                          Valid until {format(new Date(app.validUntil), 'MMM yyyy')}
+                  {/* Card body */}
+                  <div className="p-6 sm:p-8">
+                    {isActive ? (
+                      <>
+                        {/* On-screen flip card */}
+                        <div className="flex justify-center print:hidden">
+                          <HealthCard data={app} />
+                        </div>
+                        {/* Hidden print layout — both faces stacked, picked up by print CSS */}
+                        <div className="health-card-print hidden print:block">
+                          <HealthCard data={app} static />
+                        </div>
+                        <div className="mt-6 flex flex-wrap justify-center gap-2 print:hidden">
+                          <button
+                            onClick={() => window.print()}
+                            className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-colors"
+                          >
+                            <FiPrinter className="w-4 h-4" /> Print Card
+                          </button>
+                          <Link
+                            href="/health-card"
+                            className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-colors"
+                          >
+                            <FiDownload className="w-4 h-4" /> View Benefits
+                          </Link>
+                        </div>
+                        <div className="mx-auto mt-6 grid max-w-2xl gap-3 sm:grid-cols-3 print:hidden">
+                          {[
+                            ['Show at reception', 'Present your active card before service.'],
+                            ['Keep it personal', 'Membership benefits are non-transferable.'],
+                            ['Check validity', 'Your dates are printed on the card front.'],
+                          ].map(([title, copy]) => (
+                            <div key={title} className="rounded-2xl border border-primary-100 bg-primary-50/60 p-4 text-center">
+                              <p className="text-xs font-bold uppercase tracking-wide text-primary-800">{title}</p>
+                              <p className="mt-1 text-xs leading-relaxed text-neutral-600">{copy}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="mt-4 text-center text-xs text-neutral-500 max-w-sm mx-auto print:hidden">
+                          Tap the card to flip and see terms. Carry this card on every visit to claim
+                          your membership discounts.
                         </p>
-                      )}
-                      {!app.validUntil && app.validFrom && app.validTo && (
-                        <p className="text-xs opacity-75 mt-1">
-                          Valid: {format(new Date(app.validFrom), 'MMM yyyy')} – {format(new Date(app.validTo), 'MMM yyyy')}
-                        </p>
-                      )}
-                    </div>
-                  ) : null}
-
-                  {app.status === 'rejected' && app.rejectionReason && (
-                    <div className="bg-red-50 rounded-lg p-3 mt-2">
-                      <p className="text-sm text-red-700">
-                        <span className="font-medium">Reason: </span>{app.rejectionReason}
-                      </p>
-                    </div>
-                  )}
-
-                  {app.status === 'pending' && (
-                    <p className="text-sm text-neutral-500 mt-2">
-                      Your application is being reviewed. You will be notified once approved.
-                    </p>
-                  )}
+                      </>
+                    ) : app.status === 'rejected' ? (
+                      <div className="rounded-xl bg-red-50 border border-red-100 p-4">
+                        <p className="text-sm font-semibold text-red-800">Application Rejected</p>
+                        {app.rejectionReason && (
+                          <p className="text-sm text-red-700 mt-1">
+                            <span className="font-medium">Reason: </span>
+                            {app.rejectionReason}
+                          </p>
+                        )}
+                        <Link
+                          href="/health-card"
+                          className="inline-block mt-3 text-sm font-semibold text-red-700 underline hover:text-red-800"
+                        >
+                          Re-apply →
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl bg-amber-50 border border-amber-100 p-4 flex gap-3">
+                        <FiClock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-amber-900">
+                            Your application is being reviewed
+                          </p>
+                          <p className="text-sm text-amber-800 mt-0.5">
+                            We typically approve within 24–48 hours. You'll receive an SMS or call
+                            once your card is ready.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
     </div>
   );
 }

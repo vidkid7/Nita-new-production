@@ -3,13 +3,15 @@
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Calendar, Phone, Ruler, Syringe, Droplets, Brain, Smile, Baby, HeartPulse } from 'lucide-react';
-import { FiCalendar, FiCheckCircle, FiPhone } from 'react-icons/fi';
+import { FiCalendar, FiPhone } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { get } from '@/lib/api';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
+import { PackageSelectionSection, normalizePackageRecord, type PackageSelectionPackage } from '@/components/packages/PackageSelectionSection';
 
 const WHAT_IS_INCLUDED = [
   { icon: Ruler, title: 'Growth Assessment', desc: 'Height, weight, BMI, and head circumference plotted against WHO growth standards for the child\'s age.' },
@@ -51,20 +53,13 @@ const FAQS = [
 
 export default function PediatricsCheckupPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [packages, setPackages] = useState<
-    { id: string; name: string; discountedPrice: number; tests: string[] }[]
-  >([]);
+  const [packages, setPackages] = useState<PackageSelectionPackage[]>([]);
 
   useEffect(() => {
     get<Array<Record<string, unknown>>>('packages?category=pediatrics')
       .then((rows) => {
         setPackages(
-          (rows || []).map((p) => ({
-            id: String(p.id),
-            name: String(p.name || ''),
-            discountedPrice: Number(p.discountedPrice ?? 0),
-            tests: Array.isArray(p.tests) ? (p.tests as string[]) : [],
-          })),
+          (rows || []).map((p) => normalizePackageRecord(p, 'pediatrics')),
         );
       })
       .catch(() => setPackages([]));
@@ -153,27 +148,12 @@ export default function PediatricsCheckupPage() {
               subtitle="A complete child health journey — growth, immunity, development, and readiness for school."
             />
           </motion.div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {WHAT_IS_INCLUDED.map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                className="group relative flex gap-4 overflow-hidden rounded-2xl border border-neutral-200/70 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_16px_36px_-16px_rgba(13,148,136,0.4)]"
-              >
-                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-teal-400 to-emerald-500 opacity-40 transition-opacity duration-300 group-hover:opacity-100" />
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <div>
-                  <h3 className="font-semibold text-neutral-900 text-sm transition-colors group-hover:text-teal-700">{item.title}</h3>
-                  <p className="text-xs text-neutral-500 mt-1 leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <IconTileList
+            items={WHAT_IS_INCLUDED}
+            category="pediatrics check-up included service"
+            accent="teal"
+            className="mx-auto max-w-5xl"
+          />
         </div>
       </section>
 
@@ -194,17 +174,11 @@ export default function PediatricsCheckupPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-teal-600">Age Groups</span>
               </div>
               <h2 className="text-2xl font-heading font-bold text-neutral-900 mb-6">Programs by Age</h2>
-              <div className="space-y-3">
-                {AGE_GROUPS.map((grp) => (
-                  <div key={grp.label} className="group flex gap-3 rounded-xl border border-neutral-200/60 bg-white p-3.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-[0_10px_22px_-14px_rgba(13,148,136,0.4)]">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 transition-transform duration-300 group-hover:scale-150" />
-                    <div>
-                      <p className="text-sm font-semibold text-neutral-900 group-hover:text-teal-700">{grp.label}</p>
-                      <p className="text-xs text-neutral-500 mt-0.5">{grp.focus}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <IconTileList
+                items={AGE_GROUPS.map((grp) => ({ title: grp.label, description: grp.focus, category: 'pediatric age group' }))}
+                accent="teal"
+                layout="list"
+              />
             </motion.div>
 
             {/* Tests */}
@@ -220,83 +194,20 @@ export default function PediatricsCheckupPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-teal-600">Laboratory</span>
               </div>
               <h2 className="text-2xl font-heading font-bold text-neutral-900 mb-6">Tests Included</h2>
-              <ul className="space-y-2.5">
-                {TESTS_INCLUDED.map((test) => (
-                  <li key={test} className="group flex items-center gap-3 rounded-xl border border-neutral-200/60 bg-white px-3.5 py-2.5 text-sm text-neutral-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-[0_10px_22px_-14px_rgba(13,148,136,0.4)]">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 text-white shadow-md transition-transform duration-300 group-hover:scale-110">
-                      <FiCheckCircle className="w-3.5 h-3.5" strokeWidth={3} />
-                    </span>
-                    {test}
-                  </li>
-                ))}
-              </ul>
+              <IconTileList items={TESTS_INCLUDED} category="pediatrics laboratory tests" accent="teal" layout="list" />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ── Packages ── */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <SectionHeader
-              eyebrow="Pricing"
-              title="Choose Your"
-              highlight="Package"
-            />
-          </motion.div>
-          <div className="grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
-            {packages.length === 0 ? (
-              <p className="col-span-full text-center text-neutral-500 text-sm py-8">
-                No pediatrics packages are published yet. Add them in the admin panel under Packages.
-              </p>
-            ) : (
-              packages.map((pkg, i) => {
-                const highlight = packages.length >= 3 && i === packages.length - 1;
-                return (
-                  <motion.div
-                    key={pkg.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className={cn(
-                      'rounded-2xl border p-6 flex flex-col',
-                      highlight
-                        ? 'border-primary-300 bg-gradient-to-br from-primary-50 to-primary-50 shadow-md'
-                        : 'border-neutral-200 bg-white',
-                    )}
-                  >
-                    {highlight && (
-                      <span className="inline-block bg-primary-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 w-fit uppercase tracking-wide">
-                        Featured
-                      </span>
-                    )}
-                    <h3 className="font-heading font-bold text-neutral-900 text-sm mb-2">{pkg.name}</h3>
-                    <p className="text-xs text-neutral-500 mb-4 flex-1">
-                      {pkg.tests.length ? pkg.tests.join(' · ') : 'See clinic for included tests.'}
-                    </p>
-                    <p className="text-2xl font-bold text-primary-700 mb-4">
-                      NRS {pkg.discountedPrice.toLocaleString()}
-                    </p>
-                    <Link
-                      href={`/appointments/book?specialty=pediatrics&type=checkup&package=${encodeURIComponent(pkg.name)}`}
-                      className="inline-flex items-center justify-center gap-1.5 bg-primary-600 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-primary-700 transition-colors"
-                    >
-                      <Calendar className="w-3.5 h-3.5" />
-                      Book This Package
-                    </Link>
-                  </motion.div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </section>
+      <PackageSelectionSection
+        packages={packages}
+        specialty="pediatrics"
+        specialtyLabel="child health care"
+        bookingHref="/appointments/book?specialty=pediatrics&type=checkup"
+        accent="teal"
+        emptyMessage="No pediatrics packages are published yet. Add them in the admin panel under Packages."
+      />
 
       {/* ── FAQ ── */}
       <section className="section-padding bg-neutral-50">

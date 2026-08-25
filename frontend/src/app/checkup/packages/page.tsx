@@ -34,7 +34,7 @@ const PACKAGE_PERKS = [
   },
   {
     icon: <FiShield className="w-5 h-5" />,
-    title: 'Certified labs',
+    title: 'Quality-controlled lab',
     copy: 'Every panel runs in our in-house lab with quality-controlled results and same-day reports.',
   },
   {
@@ -76,10 +76,22 @@ const FAQS = [
 ];
 
 function normalizePackage(raw: Record<string, unknown>): CheckupPackage {
+  const name = String(raw.name ?? '');
+  const lowerName = name.toLowerCase();
+  const apiCategory = String(raw.category ?? '').toLowerCase();
+  let category = apiCategory;
+
+  // The API contains duplicate below-40 rows for gender targeting. Normalize
+  // the display category without changing the API's prices or package facts.
+  if (lowerName.includes('premium') && lowerName.includes('below 40')) category = 'premium_below_40';
+  else if (lowerName.includes('general') && lowerName.includes('below 40')) category = 'general_below_40';
+  else if (lowerName.includes('female') && lowerName.includes('over 40')) category = 'female_general';
+  else if (lowerName.includes('male') && lowerName.includes('over 40')) category = 'male_general';
+
   return {
     id: String(raw.id),
-    name: String(raw.name ?? ''),
-    category: String(raw.category ?? ''),
+    name,
+    category,
     targetGroup: raw.targetGroup != null ? String(raw.targetGroup) : undefined,
     ageLabel: raw.ageLabel != null ? String(raw.ageLabel) : undefined,
     originalPrice: Number(raw.originalPrice ?? 0),
@@ -94,7 +106,8 @@ function normalizePackage(raw: Record<string, unknown>): CheckupPackage {
 }
 
 export default function CheckupPackagesPage() {
-  const [gender, setGender] = useState<'female' | 'male'>('female');
+  type PackageFilter = 'all' | 'below40' | 'female40' | 'male40' | 'tuberculosis' | 'pediatrics' | 'gynecology';
+  const [packageFilter, setPackageFilter] = useState<PackageFilter>('all');
   const [packages, setPackages] = useState<CheckupPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -104,7 +117,14 @@ export default function CheckupPackagesPage() {
       try {
         const response = await get<unknown>('packages');
         const rows = Array.isArray(response) ? response : [];
-        setPackages(rows.map((row) => normalizePackage(row as Record<string, unknown>)));
+        const normalized = rows.map((row) => normalizePackage(row as Record<string, unknown>));
+        const seen = new Set<string>();
+        setPackages(normalized.filter((pkg) => {
+          const key = `${pkg.name}|${pkg.ageLabel}|${pkg.originalPrice}|${pkg.discountedPrice}|${(pkg.tests ?? []).join('|')}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }));
       } catch {
         setPackages([]);
       } finally {
@@ -114,10 +134,19 @@ export default function CheckupPackagesPage() {
     load();
   }, []);
 
-  /** Matches API enum: female_general, female_premium, male_general, male_premium */
+  /** Keep every package reachable, including TB, paediatric, and gynaecology packages. */
   const filteredPackages = useMemo(
-    () => packages.filter((pkg) => pkg.category.startsWith(gender)),
-    [packages, gender],
+    () => packages.filter((pkg) => {
+      const category = pkg.category.toLowerCase();
+      if (packageFilter === 'all') return true;
+      if (packageFilter === 'below40') return category === 'general_below_40' || category === 'premium_below_40';
+      if (packageFilter === 'female40') return category === 'female_general' || category === 'female_premium';
+      if (packageFilter === 'male40') return category === 'male_general' || category === 'male_premium';
+      if (packageFilter === 'tuberculosis') return category.includes('tb') || category.includes('tuberc');
+      if (packageFilter === 'pediatrics') return category.includes('pediatric');
+      return category.includes('gyne') || category.includes('women');
+    }),
+    [packages, packageFilter],
   );
   const visiblePackages = filteredPackages;
 
@@ -177,18 +206,26 @@ export default function CheckupPackagesPage() {
 
       <section className="section-padding bg-neutral-50">
         <div className="container-custom">
-          <div className="flex bg-white rounded-full p-1 w-fit mx-auto mb-3 shadow-sm border border-neutral-200">
-            {(['female', 'male'] as const).map((g) => (
+          <div className="flex flex-wrap justify-center gap-2 mx-auto mb-10 max-w-5xl">
+            {([
+              ['all', 'All packages'],
+              ['below40', 'Below 40'],
+              ['female40', 'Female · Over 40'],
+              ['male40', 'Male · Over 40'],
+              ['tuberculosis', 'TB & pulmonary'],
+              ['pediatrics', 'Pediatrics'],
+              ['gynecology', 'Gynecology'],
+            ] as const).map(([filter, label]) => (
               <button
-                key={g}
-                onClick={() => setGender(g)}
-                className={`px-8 py-2 rounded-full font-semibold transition-all text-sm capitalize ${
-                  gender === g
-                    ? 'bg-primary-600 text-white shadow-md'
-                    : 'text-neutral-600 hover:text-neutral-800'
+                key={filter}
+                onClick={() => setPackageFilter(filter)}
+                className={`rounded-full border px-5 py-2.5 font-semibold transition-all text-sm ${
+                  packageFilter === filter
+                    ? 'border-primary-600 bg-primary-600 text-white shadow-md'
+                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-primary-300 hover:text-primary-700'
                 }`}
               >
-                {g === 'female' ? '♀ Female' : '♂ Male'}
+                {label}
               </button>
             ))}
           </div>
@@ -211,7 +248,7 @@ export default function CheckupPackagesPage() {
           ) : (
             <AnimatePresence mode="wait">
               <motion.div
-                key={gender}
+                key={packageFilter}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

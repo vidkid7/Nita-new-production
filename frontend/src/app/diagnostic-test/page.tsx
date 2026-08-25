@@ -28,7 +28,7 @@ function LabHeroCompact() {
       <div className="container-custom relative z-10">
         <div className="max-w-2xl">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/80">
-            <FlaskConical className="h-3.5 w-3.5" /> Nita Path Labs
+            <FlaskConical className="h-3.5 w-3.5" /> Nita Laboratory Pvt. Ltd.
           </span>
           <h1 className="mt-3 font-heading font-bold text-3xl sm:text-4xl leading-tight">
             Laboratory <span className="text-teal-300">Tests & Panels</span>
@@ -48,8 +48,8 @@ const DEPARTMENT_META: Record<
   string,
   { label: string; icon: string; accent: string; soft: string; description: string }
 > = {
-  hematology: {
-    label: 'Hematology',
+  haematology: {
+    label: 'Haematology',
     icon: '🩸',
     accent: 'bg-rose-600',
     soft: 'bg-rose-50 text-rose-700 border-rose-200',
@@ -70,11 +70,11 @@ const DEPARTMENT_META: Record<
     description: 'Culture, sensitivity, sputum, urine, stool',
   },
   serology: {
-    label: 'Serology & Immunology',
+    label: 'Serology',
     icon: '🛡️',
     accent: 'bg-violet-600',
     soft: 'bg-violet-50 text-violet-700 border-violet-200',
-    description: 'HIV, HBsAg, HCV, dengue, typhoid, RA, CRP',
+    description: 'Blood group, antibody, antigen and infection screening',
   },
   radiology: {
     label: 'Radiology & Imaging',
@@ -165,26 +165,21 @@ export default function DiagnosticTestPage() {
       setTests(FALLBACK_LAB_TESTS);
       setCategories(FALLBACK_LAB_CATEGORIES);
       try {
-        const [testsRes, catsRes] = await Promise.all([
-          get<any>('lab-tests?limit=100&sortBy=order&sortOrder=asc'),
-          get<any>('lab-tests/categories'),
-        ]);
+        const testsRes = await get<any>('lab-tests?limit=100&sortBy=order&sortOrder=asc');
         if (cancelled) return;
         const rows = testsRes?.data ?? [];
         if (Array.isArray(rows) && rows.length > 0) {
-          setTests(rows.map((t: Record<string, unknown>) => mapLabTestFromApi(t)));
+          const mapped = rows
+            .map((t: Record<string, unknown>) => mapLabTestFromApi(t))
+            .filter((test: DiagnosticTest) => FALLBACK_LAB_TESTS.some((fallback) => fallback.slug === test.slug));
+          if (mapped.length === FALLBACK_LAB_TESTS.length) {
+            const bySlug = new Map(mapped.map((test) => [test.slug, test]));
+            setTests(FALLBACK_LAB_TESTS.map((fallback) => bySlug.get(fallback.slug) || fallback));
+          }
         }
-        if (Array.isArray(catsRes) && catsRes.length > 0) {
-          setCategories(
-            catsRes.map((c: Record<string, unknown>) => ({
-              slug: String(c.slug),
-              label: String(c.name || ''),
-              icon: String(c.icon || '🔬'),
-              description: String(c.description || ''),
-              color: 'bg-primary-600',
-            })),
-          );
-        }
+        // Keep the departments from the workbook. The API currently assigns
+        // Urine R/E to Serology, while the workbook places it in Parasitology.
+        setCategories(FALLBACK_LAB_CATEGORIES);
       } catch (e) {
         if (!cancelled) {
           // Keep fallback data so the page is not empty. The user can still
@@ -212,7 +207,7 @@ export default function DiagnosticTestPage() {
     }
     // Sort: known departments first by sample priority
     const priority = [
-      'hematology',
+      'haematology',
       'biochemistry',
       'serology',
       'microbiology',

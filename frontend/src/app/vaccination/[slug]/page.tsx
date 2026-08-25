@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Clock, Users, ChevronDown, Calendar, Phone, CheckCircle2, XCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Shield, Clock, Users, ChevronDown, Calendar, Phone, XCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { FiCalendar, FiPhone } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ import { get } from '@/lib/api';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
 
 export default function VaccineDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -212,14 +213,7 @@ export default function VaccineDetailPage() {
                   highlight="Against"
                   className="mb-4 md:mb-4"
                 />
-                <div className="flex flex-wrap gap-2.5">
-                  {vaccine.protectsAgainst.map((item) => (
-                    <span key={item} className="inline-flex items-center gap-1.5 bg-primary-50 border border-primary-100 text-primary-800 text-sm font-medium px-3 py-1.5 rounded-full">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-primary-500" />
-                      {item}
-                    </span>
-                  ))}
-                </div>
+                <IconTileList items={vaccine.protectsAgainst} category="vaccination coverage" accent="teal" layout="list" />
               </motion.div>
 
               {/* Accordion sections */}
@@ -231,14 +225,7 @@ export default function VaccineDetailPage() {
                     icon: AlertTriangle,
                     iconColor: 'text-amber-500',
                     content: (
-                      <ul className="space-y-2">
-                        {vaccine.sideEffects.map((s) => (
-                          <li key={s} className="flex items-start gap-2 text-sm text-neutral-600">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 mt-1.5" />
-                            {s}
-                          </li>
-                        ))}
-                      </ul>
+                      <IconTileList items={vaccine.sideEffects} category="vaccination side effects" accent="amber" layout="list" />
                     ),
                   },
                   {
@@ -247,14 +234,7 @@ export default function VaccineDetailPage() {
                     icon: XCircle,
                     iconColor: 'text-red-500',
                     content: (
-                      <ul className="space-y-2">
-                        {vaccine.contraindications.map((c) => (
-                          <li key={c} className="flex items-start gap-2 text-sm text-neutral-600">
-                            <XCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0 mt-0.5" />
-                            {c}
-                          </li>
-                        ))}
-                      </ul>
+                      <IconTileList items={vaccine.contraindications} category="vaccination contraindications" accent="rose" layout="list" />
                     ),
                   },
                 ].map((section) => (

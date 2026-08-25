@@ -118,7 +118,7 @@ export class AuthService {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2563eb;">Password Reset Request</h2>
         <p>Hello ${user.name},</p>
-        <p>We received a request to reset your password for your Nita Clinics account.</p>
+        <p>We received a request to reset your password for your Nita Clinic account.</p>
         <p>Click the button below to reset your password. This link expires in 30 minutes.</p>
         <a href="${resetLink}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin: 16px 0;">Reset Password</a>
         <p style="color: #6b7280; font-size: 14px;">If you did not request a password reset, please ignore this email. Your password will remain unchanged.</p>
@@ -129,7 +129,7 @@ export class AuthService {
     try {
       await this.notificationsService.sendEmail(
         user.email,
-        'Password Reset Request — Nita Clinics',
+        'Password Reset Request — Nita Clinic',
         html,
       );
     } catch (error) {

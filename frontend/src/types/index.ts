@@ -400,7 +400,7 @@ export interface SiteSettings {
 }
 
 // ============================================
-// Nita Clinics Domain Types
+// Nita Clinic Domain Types
 // ============================================
 
 export type PackageCategory =

@@ -28,6 +28,8 @@ const ART_MAP: Record<
   heartbeat: HeartEcgDrawing,
   creditCard: HealthCardDrawing,
   pill: PillDrawing,
+  xray: MicroscopeDrawing,
+  syringe: PillDrawing,
 };
 
 type ArtStyle = {

@@ -29,7 +29,7 @@ const fallbackPosts: BlogPost[] = [
     excerpt:
       'Monsoon brings waterborne and respiratory illnesses. Here are simple steps to protect your family throughout the season.',
     featuredImage: 'https://images.unsplash.com/photo-1576671081837-49000212a370?w=800&q=80',
-    author: 'Dr. Nita Clinics Team',
+    author: 'Dr. Nita Clinic Team',
     category: 'Preventive Health',
     readingTime: 5,
     isPublished: true,
@@ -41,7 +41,7 @@ const fallbackPosts: BlogPost[] = [
     excerpt:
       'Immunization is not just for children. Discover which vaccines adults should keep updated and why they matter for lifelong health.',
     featuredImage: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80',
-    author: 'Dr. Nita Clinics Team',
+    author: 'Dr. Nita Clinic Team',
     category: 'Vaccination',
     readingTime: 4,
     isPublished: true,

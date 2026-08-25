@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, FileText, Pencil, ChevronDown, Calendar, Phone, Stethoscope, Scan, ClipboardList, Droplets, TestTube, HeartPulse } from 'lucide-react';
-import { FiCalendar, FiCheckCircle, FiPhone } from 'react-icons/fi';
+import { FileText, Pencil, ChevronDown, Calendar, Phone, Stethoscope, Scan, ClipboardList, Droplets, TestTube, HeartPulse } from 'lucide-react';
+import { FiCalendar, FiPhone } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { get } from '@/lib/api';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
+import { PackageSelectionSection, normalizePackageRecord, type PackageSelectionPackage } from '@/components/packages/PackageSelectionSection';
 
 const WHAT_IS_INCLUDED = [
   { icon: Stethoscope, title: 'Clinical Consultation', desc: 'Detailed medical history review, lifestyle assessment, and physical examination by a senior gynaecologist.' },
@@ -55,20 +57,13 @@ const FAQS = [
 
 export default function GynecologyCheckupPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [packages, setPackages] = useState<
-    { id: string; name: string; discountedPrice: number; tests: string[] }[]
-  >([]);
+  const [packages, setPackages] = useState<PackageSelectionPackage[]>([]);
 
   useEffect(() => {
     get<Array<Record<string, unknown>>>('packages?category=gynecology')
       .then((rows) => {
         setPackages(
-          (rows || []).map((p) => ({
-            id: String(p.id),
-            name: String(p.name || ''),
-            discountedPrice: Number(p.discountedPrice ?? 0),
-            tests: Array.isArray(p.tests) ? (p.tests as string[]) : [],
-          })),
+          (rows || []).map((p) => normalizePackageRecord(p, 'gynecology')),
         );
       })
       .catch(() => setPackages([]));
@@ -158,27 +153,12 @@ export default function GynecologyCheckupPage() {
             />
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {WHAT_IS_INCLUDED.map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                className="group relative flex gap-4 overflow-hidden rounded-2xl border border-neutral-200/70 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-[0_16px_36px_-16px_rgba(244,63,94,0.4)]"
-              >
-                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-rose-400 to-pink-500 opacity-40 transition-opacity duration-300 group-hover:opacity-100" />
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <div>
-                  <h3 className="font-semibold text-neutral-900 text-sm transition-colors group-hover:text-rose-700">{item.title}</h3>
-                  <p className="text-xs text-neutral-500 mt-1 leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <IconTileList
+            items={WHAT_IS_INCLUDED}
+            category="gynecology check-up included service"
+            accent="rose"
+            className="mx-auto max-w-5xl"
+          />
         </div>
       </section>
 
@@ -205,16 +185,7 @@ export default function GynecologyCheckupPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-rose-600">Laboratory</span>
               </div>
               <h2 className="text-2xl font-heading font-bold text-neutral-900 mb-6">Tests Included</h2>
-              <ul className="space-y-2.5">
-                {TESTS_INCLUDED.map((test) => (
-                  <li key={test} className="group flex items-center gap-3 rounded-xl border border-neutral-200/60 bg-white px-3.5 py-2.5 text-sm text-neutral-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-[0_10px_22px_-14px_rgba(244,63,94,0.4)]">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-pink-500 text-white shadow-md transition-transform duration-300 group-hover:scale-110">
-                      <FiCheckCircle className="w-3.5 h-3.5" strokeWidth={3} />
-                    </span>
-                    {test}
-                  </li>
-                ))}
-              </ul>
+              <IconTileList items={TESTS_INCLUDED} category="gynecology laboratory tests" accent="rose" layout="list" />
             </motion.div>
 
             {/* Recommended for */}
@@ -231,81 +202,20 @@ export default function GynecologyCheckupPage() {
                 <span className="text-xs font-bold uppercase tracking-widest text-pink-600">Who Should Get This</span>
               </div>
               <h2 className="text-2xl font-heading font-bold text-neutral-900 mb-6">Recommended For</h2>
-              <ul className="space-y-2.5">
-                {RECOMMENDED_FOR.map((item) => (
-                  <li key={item} className="group flex items-start gap-3 rounded-xl border border-neutral-200/60 bg-white px-3.5 py-2.5 text-sm text-neutral-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-pink-200 hover:shadow-[0_10px_22px_-14px_rgba(236,72,153,0.4)]">
-                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 transition-transform duration-300 group-hover:scale-150" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              <IconTileList items={RECOMMENDED_FOR} category="gynecology recommendations" accent="rose" layout="list" />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ── Packages / Pricing ── */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-10"
-          >
-            <span className="inline-block bg-rose-50 text-rose-700 text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase tracking-wide">
-              Pricing
-            </span>
-            <h2 className="text-3xl font-heading font-bold text-neutral-900">Choose Your Package</h2>
-          </motion.div>
-          <div className="grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
-            {packages.length === 0 ? (
-              <p className="col-span-full text-center text-neutral-500 text-sm py-8">
-                No gynecology packages are published yet. Add them in the admin panel under Packages.
-              </p>
-            ) : (
-              packages.map((pkg, i) => {
-                const highlight = packages.length >= 3 && i === packages.length - 1;
-                return (
-                  <motion.div
-                    key={pkg.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className={cn(
-                      'rounded-2xl border p-6 flex flex-col',
-                      highlight
-                        ? 'border-rose-300 bg-gradient-to-br from-rose-50 to-pink-50 shadow-md'
-                        : 'border-neutral-200 bg-white',
-                    )}
-                  >
-                    {highlight && (
-                      <span className="inline-block bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 w-fit uppercase tracking-wide">
-                        Featured
-                      </span>
-                    )}
-                    <h3 className="font-heading font-bold text-neutral-900 text-base mb-2">{pkg.name}</h3>
-                    <p className="text-xs text-neutral-500 mb-4 flex-1">
-                      {pkg.tests.length ? pkg.tests.join(' · ') : 'See clinic for included tests.'}
-                    </p>
-                    <p className="text-2xl font-bold text-rose-700 mb-4">
-                      NRS {pkg.discountedPrice.toLocaleString()}
-                    </p>
-                    <Link
-                      href={`/appointments/book?specialty=gynecology-obstetrics&type=checkup&package=${encodeURIComponent(pkg.name)}`}
-                      className="inline-flex items-center justify-center gap-1.5 bg-rose-600 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-rose-700 transition-colors"
-                    >
-                      <Calendar className="w-3.5 h-3.5" />
-                      Book This Package
-                    </Link>
-                  </motion.div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </section>
+      <PackageSelectionSection
+        packages={packages}
+        specialty="gynecology"
+        specialtyLabel="women's health care"
+        bookingHref="/appointments/book?specialty=gynecology-obstetrics&type=checkup"
+        accent="rose"
+        emptyMessage="No gynecology packages are published yet. Add them in the admin panel under Packages."
+      />
 
       {/* ── FAQ ── */}
       <section className="section-padding bg-neutral-50">

@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FiCheck, FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight } from 'react-icons/fi';
+import { IconTileList } from '@/components/ui/IconTileList';
 
 const features = [
   'Modern lab tests with fast report turnaround',
@@ -79,14 +80,14 @@ export function AboutSection() {
             className="pt-4 lg:pt-0"
           >
             <span className="inline-block bg-primary-50 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
-              About Nita Clinics
+              About Nita Clinic
             </span>
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-neutral-900 mb-4">
               Your Trusted{' '}
               <span className="text-primary-600">Healthcare Partner</span>
             </h2>
             <p className="text-neutral-600 mb-3 leading-relaxed">
-              Nita Clinics is Kathmandu&apos;s accredited multi-specialty clinic, serving patients since
+              Nita Clinic is Kathmandu&apos;s trusted multi-specialty clinic, serving patients since
               2014. We combine modern lab and screening technology with specialist clinical care
               under one roof.
             </p>
@@ -96,16 +97,14 @@ export function AboutSection() {
               individual and family.
             </p>
 
-            <ul className="space-y-2.5 mb-8">
-              {features.map((f) => (
-                <li key={f} className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <FiCheck className="w-3 h-3 text-primary-600" />
-                  </div>
-                  <span className="text-neutral-700 text-sm">{f}</span>
-                </li>
-              ))}
-            </ul>
+            <IconTileList
+              items={features}
+              category="Nita Clinic care features"
+              accent="teal"
+              layout="list"
+              className="mb-8 gap-2"
+              itemClassName="min-h-[58px] rounded-2xl p-2.5"
+            />
 
             <div className="flex flex-wrap gap-3">
               <Link

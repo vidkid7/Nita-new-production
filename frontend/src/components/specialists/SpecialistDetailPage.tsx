@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FiChevronDown, FiCheckCircle, FiCalendar } from 'react-icons/fi';
+import { FiChevronDown, FiCalendar } from 'react-icons/fi';
 import { get, PaginatedResponse } from '@/lib/api';
 import { DoctorCard } from '@/components/ui/DoctorCard';
 import { VideoHeroBackground } from '@/components/ui/VideoHeroBackground';
@@ -12,6 +12,7 @@ import { CTAFooter } from '@/components/ui/CTAFooter';
 import { DoctorDetailModal, type DoctorDetailData } from '@/components/specialists/DoctorDetailModal';
 import { FlowerDrawing, BabyDrawing, LungsDrawing } from '@/components/home/SpecialistArtworks';
 import { JsonLd } from '@/components/seo/JsonLd';
+import { IconTileList } from '@/components/ui/IconTileList';
 import type { SpecialistPageData, FallbackDoctor } from '@/lib/specialist-data';
 import { BRAND } from '@/lib/brand';
 
@@ -34,10 +35,10 @@ type ApiDoctor = {
   photo?: string;
   experience?: number;
   phone?: string;
+  availableDays?: string;
 };
 
 function toDoctorCardProps(d: ApiDoctor | FallbackDoctor, slug: string) {
-  const isFallback = 'images' in d;
   return {
     id: d.id,
     name: d.name,
@@ -45,15 +46,11 @@ function toDoctorCardProps(d: ApiDoctor | FallbackDoctor, slug: string) {
     qualification: d.qualification || 'Specialist',
     experience: 'experience' in d ? d.experience : undefined,
     rating: 'rating' in d ? d.rating : 4.8,
-    availableDays: 'availableDays' in d ? d.availableDays : 'Mon – Fri',
+    availableDays: 'availableDays' in d ? d.availableDays : undefined,
     bio: 'bio' in d ? d.bio : undefined,
     phone: 'phone' in d ? d.phone : undefined,
     isTopRated: 'isTopRated' in d ? d.isTopRated : false,
-    images: isFallback
-      ? (d as FallbackDoctor).images
-      : (d as ApiDoctor).photo
-      ? [(d as ApiDoctor).photo as string]
-      : [],
+    images: [],
     bookingHref: `/appointments/book?specialty=${slug}&doctor=${encodeURIComponent(d.name)}`,
   };
 }
@@ -77,7 +74,7 @@ export function SpecialistDetailPage({
       qualification: d.qualification || 'Specialist',
       experience: 'experience' in d ? d.experience : undefined,
       rating: 'rating' in d ? (d as FallbackDoctor).rating : 4.8,
-      availableDays: 'availableDays' in d ? (d as FallbackDoctor).availableDays : 'Mon – Fri',
+      availableDays: 'availableDays' in d ? (d as FallbackDoctor).availableDays : undefined,
       bio: d.bio,
       phone: 'phone' in d ? (d as FallbackDoctor).phone : '+977 01-4533361',
       isTopRated: 'isTopRated' in d ? !!(d as FallbackDoctor).isTopRated : false,
@@ -132,16 +129,13 @@ export function SpecialistDetailPage({
       <JsonLd data={physicianSchema} />
 
       {/* ── Hero banner ── */}
-      <section className="py-12 md:py-16 lg:py-20 bg-primary-950 text-white relative overflow-hidden min-h-[calc(100vh-64px)] flex items-center">
+      <section className="relative flex min-h-[440px] items-center overflow-hidden bg-primary-950 py-16 text-white md:min-h-[500px] md:py-20">
         <VideoHeroBackground
           src={data.heroVideo.src}
           poster={data.heroVideo.poster}
           overlayClassName="from-primary-950/[0.88] via-primary-900/[0.66] to-primary-700/[0.42]"
         />
-        <div className="absolute inset-0 opacity-[0.06]">
-          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-white blur-3xl" />
-        </div>
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.12),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(45,212,191,0.12),transparent_30%)]" />
         <div className="container-custom relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -179,63 +173,42 @@ export function SpecialistDetailPage({
       </section>
 
       {/* ── Conditions treated ── */}
-      <section className="section-padding relative overflow-hidden bg-white">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute inset-0 plus-pattern-light opacity-40" />
-          <div className="absolute -top-24 left-1/4 h-72 w-96 rounded-full bg-primary-50 blur-3xl" />
-          <div className="absolute bottom-0 right-[-4rem] h-64 w-80 rounded-full bg-rose-50/60 blur-3xl" />
-        </div>
-        <div className="relative container-custom">
+      <section className="section-padding border-b border-neutral-100 bg-white">
+        <div className="container-custom">
           <SectionHeader
             eyebrow="What We Treat"
             title="Conditions"
             highlight="we care for"
             subtitle="A focused list of the concerns our specialists regularly support."
-            className="mb-10"
+            className="mb-8"
           />
-          <div className="flex flex-wrap gap-3 justify-center max-w-3xl mx-auto">
-            {data.conditions.map((condition, i) => (
-              <motion.span
-                key={condition}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: i * 0.04 }}
-                className="inline-flex items-center gap-2 rounded-full border border-neutral-200/70 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-200 hover:text-primary-700 hover:shadow-[0_10px_24px_-12px_rgba(1,173,165,0.5)]"
-              >
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-teal-500 text-white shadow-md">
-                  <FiCheckCircle className="h-3 w-3" strokeWidth={3} />
-                </span>
-                {condition}
-              </motion.span>
-            ))}
-          </div>
+          <IconTileList
+            items={data.conditions}
+            category={`${data.heading} conditions`}
+            accent="teal"
+            className="mx-auto max-w-5xl"
+          />
         </div>
       </section>
 
       {/* ── Doctors grid ── */}
-      <section className="section-padding relative overflow-hidden bg-neutral-50">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute inset-0 plus-pattern-light opacity-40" />
-          <div className="absolute -top-24 left-1/3 h-72 w-96 rounded-full bg-primary-50 blur-3xl" />
-          <div className="absolute bottom-0 left-[-4rem] h-64 w-80 rounded-full bg-teal-50/60 blur-3xl" />
-        </div>
-        <div className="relative container-custom">
+      <section className="section-padding border-b border-neutral-100 bg-neutral-50/80">
+        <div className="container-custom">
           <SectionHeader
             eyebrow="Our Team"
             title={`${data.heading}`}
             highlight="specialists"
             subtitle="Our experienced consultants are available for in-person and online appointments. Click Book Now to reserve your slot."
-            className="mb-12"
+            className="mb-8"
           />
 
           {!apiLoaded ? (
             /* Skeleton loader */
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2].map((n) => (
-                <div key={n} className="rounded-3xl border border-neutral-200/70 bg-white shadow-md overflow-hidden animate-pulse">
-                  <div className="h-64 bg-gradient-to-br from-neutral-100 to-neutral-200" />
-                  <div className="p-5 space-y-3">
+                <div key={n} className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white animate-pulse">
+                  <div className="h-52 bg-neutral-100" />
+                  <div className="space-y-3 p-5">
                     <div className="h-5 bg-neutral-200 rounded w-2/3" />
                     <div className="h-4 bg-neutral-200 rounded w-1/2" />
                     <div className="h-4 bg-neutral-200 rounded w-3/4" />
@@ -245,7 +218,8 @@ export function SpecialistDetailPage({
               ))}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            displayDoctors.length > 0 ? (
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {displayDoctors.map((doc) => {
                 const rawDoc = apiLoaded && filteredApiDoctors.length
                   ? filteredApiDoctors.find((d) => d.id === doc.id) as ApiDoctor | undefined
@@ -253,7 +227,7 @@ export function SpecialistDetailPage({
                 return (
                   <DoctorCard
                     key={doc.id}
-                    images={doc.images}
+                    images={[]}
                     name={doc.name}
                     specialization={doc.specialization}
                     qualification={doc.qualification}
@@ -264,62 +238,52 @@ export function SpecialistDetailPage({
                     phone={doc.phone}
                     isTopRated={doc.isTopRated}
                     bookingHref={doc.bookingHref}
-                    onViewProfile={rawDoc ? () => openDoctorModal(rawDoc, doc.images) : undefined}
+                    onViewProfile={rawDoc ? () => openDoctorModal(rawDoc, []) : undefined}
                   />
                 );
               })}
             </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-neutral-300 bg-white px-6 py-10 text-center">
+                <p className="font-heading text-lg font-semibold text-neutral-800">Specialist profiles are being updated.</p>
+                <p className="mt-2 text-sm text-neutral-500">Please call the clinic to book this service.</p>
+                <a href="tel:+977014533361" className="mt-5 inline-flex rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700">
+                  Call the clinic
+                </a>
+              </div>
+            )
           )}
         </div>
       </section>
 
       {/* ── Procedures ── */}
-      <section className="section-padding relative overflow-hidden bg-white">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute inset-0 plus-pattern-light opacity-40" />
-          <div className="absolute -top-24 right-1/4 h-72 w-96 rounded-full bg-primary-50 blur-3xl" />
-          <div className="absolute bottom-0 right-[-4rem] h-64 w-80 rounded-full bg-emerald-50/60 blur-3xl" />
-        </div>
-        <div className="relative container-custom">
+      <section className="section-padding border-b border-neutral-100 bg-white">
+        <div className="container-custom">
           <SectionHeader
             eyebrow="What We Offer"
             title="Procedures"
             highlight="& Tests"
             subtitle="Everything we provide within this specialty — all under one roof."
-            className="mb-10"
+            className="mb-8"
           />
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-4xl mx-auto">
-            {data.procedures.map((procedure, i) => (
-              <motion.div
-                key={procedure}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-                className="group flex items-center gap-3 rounded-2xl border border-neutral-200/70 bg-white px-4 py-3.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-200/70 hover:bg-primary-50/40 hover:shadow-[0_14px_30px_-16px_rgba(1,173,165,0.5)]"
-              >
-                <span className={`relative flex h-2.5 w-2.5 shrink-0 rounded-full ${data.accentColor} transition-transform duration-300 group-hover:scale-150`} />
-                <span className="text-neutral-700 text-sm font-medium transition-colors group-hover:text-primary-800">{procedure}</span>
-              </motion.div>
-            ))}
-          </div>
+          <IconTileList
+            items={data.procedures}
+            category={`${data.heading} procedures and tests`}
+            accent="teal"
+            className="mx-auto max-w-5xl"
+          />
         </div>
       </section>
 
       {/* ── FAQ ── */}
-      <section className="section-padding relative overflow-hidden bg-neutral-50">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute inset-0 plus-pattern-light opacity-40" />
-          <div className="absolute -top-24 left-1/3 h-72 w-96 rounded-full bg-primary-50 blur-3xl" />
-          <div className="absolute bottom-0 right-[-4rem] h-64 w-80 rounded-full bg-teal-50/60 blur-3xl" />
-        </div>
-        <div className="relative container-custom max-w-3xl">
+      <section className="section-padding bg-neutral-50/80">
+        <div className="container-custom max-w-3xl">
           <SectionHeader
             eyebrow="FAQ"
             title="Frequently Asked"
             highlight="Questions"
             subtitle="Answers to the questions patients ask us most often."
-            className="mb-10"
+            className="mb-8"
           />
 
           <div className="space-y-3">

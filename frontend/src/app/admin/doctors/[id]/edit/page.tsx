@@ -8,8 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import toast from 'react-hot-toast';
-import { get, patch, post, del, getErrorMessage } from '@/lib/api';
-import axios from 'axios';
+import { get, patch, post, del, getErrorMessage, uploadFile } from '@/lib/api';
 
 interface DoctorForm {
   id: string;
@@ -140,23 +139,9 @@ export default function EditDoctorPage({ params }: { params: { id: string } }) {
       if (photoFile) {
         setIsUploadingPhoto(true);
         try {
-          const formData = new FormData();
-          formData.append('file', photoFile);
-          formData.append('folder', 'doctors');
+          const uploadResponse = await uploadFile('media/upload', photoFile, undefined, 'doctors');
 
-          const token = localStorage.getItem('admin_auth_token');
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-          const uploadResponse = await axios.post(
-            `${apiUrl}/api/v1/media/upload`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          photoUrl = uploadResponse.data.url;
+          photoUrl = uploadResponse.url;
           toast.success('Photo uploaded successfully');
         } catch (error: any) {
           console.error('Failed to upload photo', error);

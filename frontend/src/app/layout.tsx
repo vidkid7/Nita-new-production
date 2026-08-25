@@ -29,11 +29,11 @@ export const metadata: Metadata = {
   description:
     `${BRAND.name} is your trusted clinic in Kathmandu for specialist consultations, lab tests, check-up packages, vaccination services, and preventive healthcare.`,
   keywords: [
-    'nita clinics',
+    'nita clinic',
     'clinic kathmandu',
     'health checkup nepal',
     'lab test kathmandu',
-    'our services nita clinics',
+    'our services nita clinic',
     'vaccination clinic',
     'specialist doctors nepal',
   ],

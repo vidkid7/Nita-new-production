@@ -12,12 +12,12 @@ import {
   ShieldCheck,
   Award,
   Sparkles,
-  CheckCircle2,
   Pill,
 } from 'lucide-react';
 import { PremiumLandingHero } from '@/components/ui/PremiumLandingHero';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CTAFooter } from '@/components/ui/CTAFooter';
+import { IconTileList } from '@/components/ui/IconTileList';
 import { FiCalendar } from 'react-icons/fi';
 
 interface ServiceCard {
@@ -42,7 +42,7 @@ const SERVICES: ServiceCard[] = [
     icon: <FlaskConical className="h-7 w-7" />,
     badge: 'MOST BOOKED',
     title: 'Laboratory Services',
-    tagline: 'NABL-grade testing, same-day reports',
+    tagline: 'Fast laboratory testing, same-day reports',
     description:
       'Walk into our in-house lab for 36+ tests across 5 departments — Haematology, Biochemistry, Serology, Microbiology and Parasitology. Same-day reports for every test, transparent NRP pricing, no hidden fees.',
     highlights: [
@@ -104,7 +104,7 @@ const SERVICES: ServiceCard[] = [
     title: 'Online Consultation',
     tagline: 'Video call with a doctor, anywhere',
     description:
-      'Speak to a licensed Nita Clinics doctor from home or office via secure video call. Get a digital prescription, e-referral for lab tests, and follow-up support — no travel, no waiting room.',
+      'Speak to a licensed Nita Clinic doctor from home or office via secure video call. Get a digital prescription, e-referral for lab tests, and follow-up support — no travel, no waiting room.',
     highlights: [
       'Video call with licensed doctors',
       'Digital prescription & e-referrals',
@@ -124,7 +124,7 @@ const SERVICES: ServiceCard[] = [
     title: 'Pharmacy',
     tagline: 'Counter pickup & home delivery',
     description:
-      'Pick up your prescription at the Nita Clinics counter or get same-day home delivery within Kathmandu Valley. Pharmacist-reviewed, cold-chain safe, and priced transparently.',
+      'Pick up your prescription at the Nita Clinic counter or get same-day home delivery within Kathmandu Valley. Pharmacist-reviewed, cold-chain safe, and priced transparently.',
     highlights: [
       'Walk-in counter in Bhimselgola-9',
       'Same-day home delivery in valley',
@@ -141,8 +141,8 @@ const SERVICES: ServiceCard[] = [
 const PROMISE = [
   {
     icon: <ShieldCheck className="h-5 w-5" />,
-    title: 'Certified clinical standards',
-    copy: 'NABL-grade lab, trained nurses, and doctors across all departments.',
+    title: 'Reliable clinical care',
+    copy: 'Modern laboratory services, trained nurses, and doctors across all departments.',
   },
   {
     icon: <Clock className="h-5 w-5" />,
@@ -165,7 +165,7 @@ export default function ServicesPage() {
   return (
     <main>
       <PremiumLandingHero
-        eyebrow="Our Services · Nita Clinics"
+        eyebrow="Our Services · Nita Clinic"
         title="Five ways to care"
         highlight="for you and your family."
         description="Pick the service that fits your day — walk into our lab, pick up medicines, book a home visit, get a vaccine, or talk to a doctor online. Same standard of care, same team, same record."
@@ -192,7 +192,7 @@ export default function ServicesPage() {
         panelItems={[
           'Walk in for a lab test, vaccination, or a check-up — no appointment needed for most services.',
           'Prefer to stay home? Book a home visit for doctor consultation, sample collection, or vaccination.',
-          'Short on time? Book a video consultation with a Nita Clinics doctor and get a digital prescription.',
+          'Short on time? Book a video consultation with a Nita Clinic doctor and get a digital prescription.',
         ]}
       />
 
@@ -208,7 +208,7 @@ export default function ServicesPage() {
             eyebrow="Pick a service"
             title="What would you like"
             highlight="to do today?"
-            subtitle="Each service is run by the same Nita Clinics team and shares one health record — so wherever you start, the next step is easy."
+            subtitle="Each service is run by the same Nita Clinic team and shares one health record — so wherever you start, the next step is easy."
             className="mb-12"
           />
 
@@ -240,14 +240,14 @@ export default function ServicesPage() {
                   <p className="mt-1 text-sm font-semibold text-primary-700">{s.tagline}</p>
                   <p className="mt-3 text-sm text-neutral-600 leading-relaxed">{s.description}</p>
 
-                  <ul className="mt-4 space-y-1.5">
-                    {s.highlights.map((h) => (
-                      <li key={h} className="flex items-start gap-2 text-xs text-neutral-600">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-500" />
-                        <span>{h}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <IconTileList
+                    items={s.highlights}
+                    category={`${s.title} service highlights`}
+                    accent="teal"
+                    layout="list"
+                    className="mt-5 gap-2"
+                    itemClassName="rounded-2xl p-3"
+                  />
 
                   <div className="mt-5 flex items-center justify-between border-t border-neutral-100 pt-4">
                     {s.startingPrice && (
