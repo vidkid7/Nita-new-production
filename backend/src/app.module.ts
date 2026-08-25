@@ -63,9 +63,22 @@ import { RedisCacheModule } from './common/cache/redis-cache.module';
         if (databaseUrl) {
           // Parse DATABASE_URL for Railway/Render/Supabase
           const isDev = configService.get('NODE_ENV') === 'development';
+          // pg-connection-string treats `sslmode=require` in the URL as a
+          // certificate-verifying mode, which conflicts with the explicit
+          // `rejectUnauthorized: false` setting below on Supabase pooler URLs.
+          // Keep SSL enabled, but let the application-level SSL options win.
+          const databaseUrlForTypeorm = (() => {
+            try {
+              const parsed = new URL(databaseUrl);
+              parsed.searchParams.delete('sslmode');
+              return parsed.toString();
+            } catch {
+              return databaseUrl;
+            }
+          })();
           return {
             type: 'postgres',
-            url: databaseUrl,
+            url: databaseUrlForTypeorm,
             // schema MUST be passed even when using DATABASE_URL, otherwise TypeORM
             // silently falls back to `public` and queries the wrong tables.
             schema: configService.get('DATABASE_SCHEMA', 'nita'),
