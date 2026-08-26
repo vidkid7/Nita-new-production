@@ -209,7 +209,6 @@ export default function TeamPage() {
 
   // Doctors are intentionally kept on /doctors and /specialists only.
   const allMembers = apiMembers.filter((member) => resolveTeamCategory(member) !== null);
-  const activeCategoryCount = new Set(allMembers.map(resolveTeamCategory)).size;
 
   function openModal(member: TeamMember) {
     setSelectedDoctor({
@@ -252,9 +251,9 @@ export default function TeamPage() {
             'Front-desk guidance for smoother visits',
           ]}
           stats={[
-            { value: apiLoaded ? String(activeCategoryCount) : '…', label: 'Active Categories' },
-            { value: apiLoaded ? String(allMembers.length) : '…', label: 'Support Staff' },
-            { value: apiLoaded ? String(allMembers.length) : '…', label: 'Team Members' },
+            { value: String(DEPT_GROUPS.length), label: 'Support Functions' },
+            { value: apiLoaded ? String(allMembers.length) : '…', label: 'Staff Profiles' },
+            { value: '09–17', label: 'Coordination Hours' },
           ]}
           panelEyebrow="Team Workflow"
           panelTitle="Care works better when the team is connected."
@@ -315,9 +314,36 @@ export default function TeamPage() {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                   {members.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white/70 p-6 text-sm text-neutral-500">
-                      Profiles for this category will be added soon.
-                    </div>
+                    <article className="max-w-xl rounded-[1.75rem] border border-primary-100 bg-white p-6 shadow-[0_20px_50px_-35px_rgba(15,23,42,0.55)] md:p-7">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-600">
+                            Role profile
+                          </span>
+                          <h3 className="mt-2 font-heading text-xl font-bold text-neutral-900">
+                            Nita Clinic {grp.label} Support
+                          </h3>
+                          <p className="mt-1 text-sm font-semibold text-primary-700">
+                            {ROLE_DETAILS[grp.category].specialization}
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-primary-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-700">
+                          Nita Clinic
+                        </span>
+                      </div>
+                      <p className="mt-5 text-sm leading-7 text-neutral-600">
+                        {ROLE_DETAILS[grp.category].bio}
+                      </p>
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-100 pt-4 text-xs text-neutral-500">
+                        <span>Monday–Saturday · 9:00 AM–5:00 PM</span>
+                        <a
+                          href="tel:+977014533361"
+                          className="font-bold text-primary-700 transition-colors hover:text-primary-900"
+                        >
+                          Contact front desk →
+                        </a>
+                      </div>
+                    </article>
                   ) : members.map((member, mi) => (
                     <motion.div
                       key={member.id}
