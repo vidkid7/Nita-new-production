@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Doctor } from './entities/doctor.entity';
@@ -11,8 +11,22 @@ import { CreateLeaveDto } from './dto/create-leave.dto';
 import { PaginationDto, PaginatedResponseDto } from '@/common/dto/pagination.dto';
 import { addMinutes, format, parse, isAfter, isBefore, isEqual } from 'date-fns';
 
+const PUBLISHED_SCHEDULES: Record<string, Array<{ dayOfWeek: number; startTime: string; endTime: string }>> = {
+  'rupa.bajagain@nitaclinics.com': [
+    ...[1, 2, 3, 4, 5].flatMap((dayOfWeek) => [
+      { dayOfWeek, startTime: '07:00', endTime: '08:00' },
+      { dayOfWeek, startTime: '16:00', endTime: '19:00' },
+    ]),
+    { dayOfWeek: 6, startTime: '11:00', endTime: '14:00' },
+  ],
+  'sudeep.kc@nitaclinics.com': [
+    ...[1, 2, 3, 4].map((dayOfWeek) => ({ dayOfWeek, startTime: '18:00', endTime: '19:00' })),
+    { dayOfWeek: 5, startTime: '13:00', endTime: '19:00' },
+  ],
+};
+
 @Injectable()
-export class DoctorsService {
+export class DoctorsService implements OnModuleInit {
   constructor(
     @InjectRepository(Doctor)
     private doctorsRepository: Repository<Doctor>,
@@ -21,6 +35,44 @@ export class DoctorsService {
     @InjectRepository(DoctorLeave)
     private leaveRepository: Repository<DoctorLeave>,
   ) {}
+
+  async onModuleInit(): Promise<void> {
+    try {
+      await this.syncPublishedAvailability();
+    } catch (error) {
+      // Do not take the whole API offline for a data sync issue; the error is
+      // visible in Render logs and the public schedule remains readable.
+      console.error('[Doctors] Failed to sync published availability:', error);
+    }
+  }
+
+  /**
+   * Keep the two published clinic notices reflected in the live booking data.
+   * This intentionally targets only these current doctors and avoids replaying
+   * the project's older, schema-unqualified TypeORM migrations on Render.
+   */
+  async syncPublishedAvailability(): Promise<void> {
+    const doctors = await this.doctorsRepository.find({
+      where: Object.keys(PUBLISHED_SCHEDULES).map((email) => ({ email, isActive: true })),
+      select: ['id', 'email'],
+    });
+
+    for (const doctor of doctors) {
+      const windows = PUBLISHED_SCHEDULES[doctor.email.trim().toLowerCase()];
+      if (!windows) continue;
+
+      await this.availabilityRepository.delete({ doctorId: doctor.id });
+      const records = windows.map((window) =>
+        this.availabilityRepository.create({
+          ...window,
+          doctorId: doctor.id,
+          slotDuration: 30,
+          isActive: true,
+        }),
+      );
+      await this.availabilityRepository.save(records);
+    }
+  }
 
   async create(createDoctorDto: CreateDoctorDto): Promise<Doctor> {
     const doctor = this.doctorsRepository.create(createDoctorDto);
