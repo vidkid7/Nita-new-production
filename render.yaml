@@ -54,3 +54,5 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+      - key: FRONTEND_URLS
+        sync: false   # comma-separated additional production origins, e.g. https://www.nitaclinics.com

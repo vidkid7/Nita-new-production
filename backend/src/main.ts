@@ -103,9 +103,17 @@ async function bootstrap() {
     // CORS — browser sends Origin; it must match exactly (including localhost vs 127.0.0.1).
     const primaryFrontend = configService.get('FRONTEND_URL', 'http://localhost:3000');
     const isDev = configService.get('NODE_ENV') !== 'production';
+    const configuredFrontendOrigins = configService.get('FRONTEND_URLS', '');
+    const productionOrigins = Array.from(
+      new Set(
+        [primaryFrontend, ...configuredFrontendOrigins.split(',')]
+          .map((origin) => origin.trim())
+          .filter(Boolean),
+      ),
+    );
     const devOrigins = Array.from(
       new Set([
-        primaryFrontend,
+        ...productionOrigins,
         'http://localhost:3000',
         'http://localhost:3002',
         'http://127.0.0.1:3000',
@@ -113,7 +121,7 @@ async function bootstrap() {
       ].filter(Boolean)),
     );
     app.enableCors({
-      origin: isDev ? devOrigins : primaryFrontend,
+      origin: isDev ? devOrigins : productionOrigins,
       credentials: true,
     });
 
