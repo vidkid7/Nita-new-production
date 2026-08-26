@@ -5,6 +5,11 @@ import { usePathname } from 'next/navigation';
 import { BrandLoader } from './BrandLoader';
 import { WelcomeAdModal } from './WelcomeAdModal';
 
+// Module scope survives Next client-side navigation but is reset by a full
+// browser refresh. This gives one welcome ad per document, without reopening
+// it whenever the user changes route.
+let welcomeAdShownForDocument = false;
+
 /**
  * Mounts the brand-themed full-screen loader on first paint and removes it
  * after the page has finished its initial hydration. The two-step welcome ads
@@ -22,13 +27,16 @@ export function AppBootstrap({ children }: { children: React.ReactNode }) {
   const dismissAds = useCallback(() => setShowAds(false), []);
 
   useEffect(() => {
+    if (welcomeAdShownForDocument) return;
     // Wait for two animation frames + a small delay so the hero / chrome
     // have a chance to render, then fade the loader into the welcome ads.
     const shouldShowAds = !initialPathname.current?.startsWith('/admin');
+    if (!shouldShowAds) return;
+    welcomeAdShownForDocument = true;
 
     const t = window.setTimeout(() => {
       setReady(true);
-      setShowAds(shouldShowAds && !window.location.pathname.startsWith('/admin'));
+      setShowAds(!window.location.pathname.startsWith('/admin'));
     }, 700);
     return () => {
       window.clearTimeout(t);

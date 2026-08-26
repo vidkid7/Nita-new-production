@@ -39,6 +39,7 @@ export class DoctorsService implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     try {
       await this.syncPublishedAvailability();
+      await this.ensureAvailabilityForActiveDoctors();
     } catch (error) {
       // Do not take the whole API offline for a data sync issue; the error is
       // visible in Render logs and the public schedule remains readable.
@@ -71,6 +72,37 @@ export class DoctorsService implements OnModuleInit {
         }),
       );
       await this.availabilityRepository.save(records);
+    }
+  }
+
+  /**
+   * Keep booking usable for every active clinician. Existing schedules are
+   * preserved; a conservative Mon–Sat clinic window is only added when a
+   * clinician has no active availability at all.
+   */
+  async ensureAvailabilityForActiveDoctors(): Promise<void> {
+    const doctors = await this.doctorsRepository.find({
+      where: { isActive: true },
+      select: ['id'],
+    });
+
+    for (const doctor of doctors) {
+      const activeWindows = await this.availabilityRepository.count({
+        where: { doctorId: doctor.id, isActive: true },
+      });
+      if (activeWindows > 0) continue;
+
+      const defaults = [1, 2, 3, 4, 5, 6].map((dayOfWeek) =>
+        this.availabilityRepository.create({
+          doctorId: doctor.id,
+          dayOfWeek,
+          startTime: '09:00',
+          endTime: '17:00',
+          slotDuration: 30,
+          isActive: true,
+        }),
+      );
+      await this.availabilityRepository.save(defaults);
     }
   }
 

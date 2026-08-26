@@ -56,9 +56,20 @@ export class AppController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STAFF)
   async getDashboardStats() {
+    // TypeORM is configured to use the `nita` schema, but raw SQL does not
+    // inherit that entity metadata. Qualify every table so dashboard counts
+    // reflect the same records used by the rest of the API.
+    const configuredSchema = String(
+      (this.dataSource.options as { schema?: string }).schema || 'public',
+    );
+    const schema = /^[A-Za-z_][A-Za-z0-9_]*$/.test(configuredSchema)
+      ? configuredSchema
+      : 'public';
+    const tableRef = (table: string) => `"${schema}"."${table}"`;
+
     const safeCount = async (table: string, where = '') => {
       try {
-        const sql = `SELECT COUNT(*) as count FROM "${table}"${where ? ' WHERE ' + where : ''}`;
+        const sql = `SELECT COUNT(*) as count FROM ${tableRef(table)}${where ? ' WHERE ' + where : ''}`;
         const rows = await this.dataSource.query(sql);
         return parseInt(rows?.[0]?.count ?? '0', 10);
       } catch {
@@ -89,7 +100,7 @@ export class AppController {
       safeCount('appointments', `status = 'pending'`),
       safeCount('lab_orders'),
       this.dataSource.query(
-        `SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success'`
+        `SELECT COALESCE(SUM(amount), 0) as total FROM ${tableRef('payment_transactions')} WHERE status = 'success'`
       ).then((r) => parseFloat(r?.[0]?.total ?? '0')).catch(() => 0),
       safeCount('enquiries'),
       safeCount('enquiries', `status = 'new'`),

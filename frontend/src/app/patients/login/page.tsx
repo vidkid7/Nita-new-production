@@ -20,6 +20,7 @@ export default function PatientLoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [registerHref, setRegisterHref] = useState('/patients/register');
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export default function PatientLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     const trimmedEmail = email.trim().toLowerCase();
     if (!trimmedEmail) {
       toast.error('Please enter your email');
@@ -64,7 +66,9 @@ export default function PatientLoginPage() {
       );
       router.push(next || '/patients/dashboard');
     } catch (err) {
-      toast.error(getErrorMessage(err));
+      const message = getErrorMessage(err) || 'Unable to sign in. Check your email and password.';
+      setErrorMessage(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -83,6 +87,11 @@ export default function PatientLoginPage() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
+            {errorMessage && (
+              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {errorMessage}
+              </div>
+            )}
             <div>
               <label htmlFor="patient-login-email" className="block text-sm font-medium text-neutral-700 mb-1">
                 Email

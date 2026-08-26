@@ -6,9 +6,8 @@ import type { ComponentType } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Clock, User, ArrowRight, Tag } from 'lucide-react';
 import { PremiumLandingHero } from '@/components/ui/PremiumLandingHero';
-import { CTAFooter } from '@/components/ui/CTAFooter';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { DoodleArrow, DoodleBook, DoodleShield } from '@/components/home/BlogArtworks';
+import { DoodleBook, DoodleShield } from '@/components/home/BlogArtworks';
 import { DoodleHeart } from '@/components/home/TestimonialArtworks';
 import { FALLBACK_BLOG_POSTS, type BlogPost } from '@/lib/blog-data';
 import { fetchPublishedBlogPosts } from '@/lib/blog-api';
@@ -80,12 +79,6 @@ const DEFAULT_CATEGORY_ART: CategoryArt = {
   tagText: 'text-neutral-600',
   label: 'Nita Care',
 };
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
-}
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>(FALLBACK_BLOG_POSTS);
@@ -407,6 +400,10 @@ export default function BlogPage() {
                   </motion.div>
                 );
               })}
+            </div>
+          ) : filtered.length > 0 ? (
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-6 py-10 text-center">
+              <p className="text-neutral-600">This is the only article matching your filters.</p>
             </div>
           ) : (
             <div className="text-center py-16">

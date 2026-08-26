@@ -13,6 +13,7 @@ export default function PatientRegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -31,6 +32,7 @@ export default function PatientRegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     const fullName = form.fullName.trim();
     const email = form.email.trim().toLowerCase();
     const phone = form.phone.trim().replace(/\s+/g, ' ');
@@ -64,7 +66,9 @@ export default function PatientRegisterPage() {
         ret ? `/patients/login?returnUrl=${encodeURIComponent(ret)}` : '/patients/login',
       );
     } catch (err) {
-      toast.error(getErrorMessage(err));
+      const message = getErrorMessage(err) || 'Unable to create your account.';
+      setErrorMessage(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +89,11 @@ export default function PatientRegisterPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {errorMessage && (
+              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {errorMessage}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1">Full Name</label>
               <div className="relative">

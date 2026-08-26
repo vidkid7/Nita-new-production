@@ -592,7 +592,7 @@ async function main() {
       {
         iconKey: 'microscope',
         colorKey: 'primary',
-        title: 'NITA Path Labs',
+        title: 'Nita Laboratory Pvt. Ltd.',
         desc:
           'Leading pathology & diagnostic center offering advanced testing for early disease detection, treatment monitoring, and preventive healthcare.',
         href: '/diagnostic-test',

@@ -19,6 +19,24 @@ interface DoctorDetail {
   consultationFee?: number;
   isActive: boolean;
   bio?: string;
+  department?: { name?: string };
+  availabilities?: Array<{
+    dayOfWeek: number;
+    startTime: string;
+    endTime: string;
+    slotDuration?: number;
+  }>;
+}
+
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function formatClinicTime(value: string) {
+  const [hourText, minute = '00'] = String(value || '').slice(0, 5).split(':');
+  const hour = Number(hourText);
+  if (!Number.isFinite(hour)) return value || '—';
+  const suffix = hour >= 12 ? 'PM' : 'AM';
+  const displayHour = hour % 12 || 12;
+  return `${displayHour}:${minute} ${suffix}`;
 }
 
 export default function DoctorDetailPage({ params }: { params: { id: string } }) {
@@ -107,6 +125,7 @@ export default function DoctorDetailPage({ params }: { params: { id: string } })
             <h1 className="text-2xl font-heading font-bold text-neutral-900">{doctor.name}</h1>
             <p className="text-neutral-600 text-sm">
               {doctor.specialization} • {doctor.qualification}
+              {doctor.department?.name ? ` • ${doctor.department.name}` : ''}
             </p>
           </div>
         </div>
@@ -143,7 +162,7 @@ export default function DoctorDetailPage({ params }: { params: { id: string } })
               <p className="text-neutral-700">
                 Consultation Fee:{' '}
                 <span className="font-semibold text-neutral-900">
-                  Rs. {doctor.consultationFee}
+                  {doctor.consultationFee != null ? `Rs. ${Number(doctor.consultationFee).toLocaleString('en-IN')}` : 'Not set'}
                 </span>
               </p>
 
@@ -153,25 +172,30 @@ export default function DoctorDetailPage({ params }: { params: { id: string } })
           <div className="border-t border-neutral-100 pt-4 space-y-3">
             <h2 className="font-semibold text-neutral-900 flex items-center gap-2">
               <FiCalendar className="w-4 h-4 text-primary-500" />
-              Typical Schedule (mock)
+              Availability
             </h2>
-            <ul className="text-sm text-neutral-600 space-y-1">
-              <li>• Sunday – Friday: 9:00 AM – 5:00 PM</li>
-              <li>• Saturday: 9:00 AM – 1:00 PM</li>
-              <li>• Lunch Break: 1:00 PM – 2:00 PM</li>
-            </ul>
+            {doctor.availabilities?.length ? (
+              <ul className="grid gap-2 text-sm text-neutral-600 sm:grid-cols-2">
+                {doctor.availabilities.map((slot) => (
+                  <li key={`${slot.dayOfWeek}-${slot.startTime}-${slot.endTime}`} className="rounded-lg bg-neutral-50 px-3 py-2">
+                    <span className="font-medium text-neutral-900">{DAY_NAMES[slot.dayOfWeek] || 'Day'}</span>
+                    <span className="block">{formatClinicTime(slot.startTime)} – {formatClinicTime(slot.endTime)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-amber-700">No active availability is configured yet.</p>
+            )}
           </div>
 
           <div className="border-t border-neutral-100 pt-4 space-y-3">
             <h2 className="font-semibold text-neutral-900 flex items-center gap-2">
               <FiClock className="w-4 h-4 text-primary-500" />
-              Key Treatments (mock)
+              Clinical Information
             </h2>
-            <ul className="text-sm text-neutral-600 space-y-1">
-              <li>• Comprehensive oral examination and diagnosis</li>
-              <li>• Patient education and preventive care planning</li>
-              <li>• Coordination with specialty departments</li>
-            </ul>
+            <p className="text-sm text-neutral-600 leading-relaxed">
+              {doctor.bio || `${doctor.specialization} consultations at Nita Clinic.`}
+            </p>
           </div>
         </div>
 
@@ -202,25 +226,14 @@ export default function DoctorDetailPage({ params }: { params: { id: string } })
           </div>
 
           <div className="bg-white rounded-xl shadow-soft p-6 space-y-3">
-            <h2 className="font-semibold text-neutral-900">Quick Actions (mock)</h2>
-            <p className="text-xs text-neutral-500">
-              These actions are for demonstration and would be wired to real APIs in
-              production.
-            </p>
+            <h2 className="font-semibold text-neutral-900">Doctor Workspace</h2>
             <div className="space-y-2">
-              <Button
-                className="w-full justify-center"
-                onClick={() => toast.success('Mock: Schedule created for this doctor')}
-              >
-                Create Schedule
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full justify-center"
-                onClick={() => toast.success('Mock: Exported upcoming appointments')}
-              >
-                Export Appointments
-              </Button>
+              <Link href={`/admin/doctors/${doctor.id}/edit`} className="block">
+                <Button className="w-full justify-center">Manage Availability</Button>
+              </Link>
+              <Link href={`/admin/appointments?doctorId=${encodeURIComponent(doctor.id)}`} className="block">
+                <Button variant="secondary" className="w-full justify-center">View Appointments</Button>
+              </Link>
             </div>
           </div>
         </div>

@@ -92,11 +92,14 @@ function isGenericCatalogImage(image: string | undefined): boolean {
  * placeholders are replaced by the local stock image that best fits the test.
  */
 export function resolveLabTestImage(test: Pick<DiagnosticTest, 'slug' | 'image' | 'category' | 'categorySlug' | 'name' | 'description' | 'sampleType' | 'tags'>): string {
-  const customImage = test.image?.trim();
-  if (customImage && !isGenericCatalogImage(customImage)) return customImage;
-
+  // The local catalogue mapping is the source of truth for the 35 named
+  // tests. Prefer it over stale/reused CMS URLs so related tests do not all
+  // render the same stock photograph.
   const mappedImage = test.slug ? LOCAL_LAB_IMAGES_BY_SLUG[test.slug] : undefined;
   if (mappedImage) return mappedImage;
+
+  const customImage = test.image?.trim();
+  if (customImage && !isGenericCatalogImage(customImage)) return customImage;
 
   const searchableText = [
     test.categorySlug,

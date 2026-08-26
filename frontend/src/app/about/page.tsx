@@ -76,6 +76,21 @@ export default function AboutPage() {
   useEffect(() => {
     // Load images from API
     const loadImages = async () => {
+      type ContentPayload = {
+        content?: {
+          imagePath?: unknown;
+          imagePaths?: unknown;
+        };
+      };
+      const readJson = async (response: Response): Promise<ContentPayload | null> => {
+        const text = await response.text();
+        if (!text.trim()) return null;
+        try {
+          return JSON.parse(text);
+        } catch {
+          return null;
+        }
+      };
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const fullUrl = `${apiUrl}/api/v1`;
@@ -83,9 +98,9 @@ export default function AboutPage() {
         const mainResponse = await fetch(`${fullUrl}/content/page/about/main`);
         
         if (mainResponse.ok) {
-          const data = await mainResponse.json();
+          const data = await readJson(mainResponse);
           
-          if (data?.content?.imagePath) {
+          if (typeof data?.content?.imagePath === 'string') {
             setMainImage(data.content.imagePath);
           }
         }
@@ -93,10 +108,13 @@ export default function AboutPage() {
         const servicesResponse = await fetch(`${fullUrl}/content/page/about/services-overview`);
         
         if (servicesResponse.ok) {
-          const servicesData = await servicesResponse.json();
+          const servicesData = await readJson(servicesResponse);
           
-          if (servicesData?.content?.imagePaths && Array.isArray(servicesData.content.imagePaths)) {
-            setClinicImages(servicesData.content.imagePaths);
+          if (Array.isArray(servicesData?.content?.imagePaths)) {
+            const imagePaths = servicesData.content.imagePaths.filter(
+              (path): path is string => typeof path === 'string',
+            );
+            if (imagePaths.length) setClinicImages(imagePaths);
           }
         }
       } catch (error) {
