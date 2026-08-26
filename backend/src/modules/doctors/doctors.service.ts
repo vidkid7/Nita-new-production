@@ -115,18 +115,29 @@ export class DoctorsService {
   async setAvailability(doctorId: string, availabilityDto: CreateAvailabilityDto): Promise<DoctorAvailability> {
     await this.findOne(doctorId); // Verify doctor exists
 
-    // Check for existing availability on the same day
+    // A doctor can have more than one window on the same day (for example,
+    // morning and evening clinic hours). Update an exact matching window;
+    // otherwise keep the existing window and add the new one.
     const existing = await this.availabilityRepository.findOne({
-      where: { doctorId, dayOfWeek: availabilityDto.dayOfWeek },
+      where: {
+        doctorId,
+        dayOfWeek: availabilityDto.dayOfWeek,
+        startTime: availabilityDto.startTime,
+        endTime: availabilityDto.endTime,
+      },
     });
 
     if (existing) {
-      Object.assign(existing, availabilityDto);
+      Object.assign(existing, {
+        ...availabilityDto,
+        isActive: availabilityDto.isActive ?? true,
+      });
       return this.availabilityRepository.save(existing);
     }
 
     const availability = this.availabilityRepository.create({
       ...availabilityDto,
+      isActive: availabilityDto.isActive ?? true,
       doctorId,
     });
     return this.availabilityRepository.save(availability);
@@ -135,7 +146,7 @@ export class DoctorsService {
   async getAvailabilities(doctorId: string): Promise<DoctorAvailability[]> {
     return this.availabilityRepository.find({
       where: { doctorId, isActive: true },
-      order: { dayOfWeek: 'ASC' },
+      order: { dayOfWeek: 'ASC', startTime: 'ASC' },
     });
   }
 
@@ -198,58 +209,62 @@ export class DoctorsService {
       return [];
     }
 
-    // Get availability for the day
-    const availability = await this.availabilityRepository.findOne({
+    // Get every active window for the day. Some doctors work split shifts,
+    // so using findOne here would silently drop the morning or evening window.
+    const availabilities = await this.availabilityRepository.find({
       where: { doctorId, dayOfWeek, isActive: true },
+      order: { startTime: 'ASC' },
     });
 
-    if (!availability) {
+    if (availabilities.length === 0) {
       return [];
     }
 
-    // Normalize time strings (DB may return HH:mm or HH:mm:ss)
-    const startStr =
-      typeof availability.startTime === 'string'
-        ? availability.startTime.length > 5
-          ? availability.startTime.substring(0, 5)
-          : availability.startTime
-        : '';
-    const endStr =
-      typeof availability.endTime === 'string'
-        ? availability.endTime.length > 5
-          ? availability.endTime.substring(0, 5)
-          : availability.endTime
-        : '';
-    if (!startStr || !endStr || startStr.length < 4 || endStr.length < 4) {
-      return [];
-    }
-    try {
-      const startTime = parse(startStr, 'HH:mm', new Date());
-      const endTime = parse(endStr, 'HH:mm', new Date());
-      if (Number.isNaN(startTime.getTime()) || Number.isNaN(endTime.getTime())) {
-        return [];
-      }
-      const slotDuration = availability.slotDuration || 30;
-
-      const slots: { startTime: string; endTime: string }[] = [];
-      let currentSlot = startTime;
-
-      while (isBefore(currentSlot, endTime) || isEqual(currentSlot, endTime)) {
-        const slotEnd = addMinutes(currentSlot, slotDuration);
-        if (isAfter(slotEnd, endTime)) break;
-
-        slots.push({
-          startTime: format(currentSlot, 'HH:mm'),
-          endTime: format(slotEnd, 'HH:mm'),
-        });
-
-        currentSlot = slotEnd;
+    const slots: { startTime: string; endTime: string }[] = [];
+    for (const availability of availabilities) {
+      // Normalize time strings (DB may return HH:mm or HH:mm:ss)
+      const startStr =
+        typeof availability.startTime === 'string'
+          ? availability.startTime.length > 5
+            ? availability.startTime.substring(0, 5)
+            : availability.startTime
+          : '';
+      const endStr =
+        typeof availability.endTime === 'string'
+          ? availability.endTime.length > 5
+            ? availability.endTime.substring(0, 5)
+            : availability.endTime
+          : '';
+      if (!startStr || !endStr || startStr.length < 4 || endStr.length < 4) {
+        continue;
       }
 
-      return slots;
-    } catch {
-      return [];
+      try {
+        const startTime = parse(startStr, 'HH:mm', new Date());
+        const endTime = parse(endStr, 'HH:mm', new Date());
+        if (Number.isNaN(startTime.getTime()) || Number.isNaN(endTime.getTime())) {
+          continue;
+        }
+        const slotDuration = availability.slotDuration || 30;
+        let currentSlot = startTime;
+
+        while (isBefore(currentSlot, endTime) || isEqual(currentSlot, endTime)) {
+          const slotEnd = addMinutes(currentSlot, slotDuration);
+          if (isAfter(slotEnd, endTime)) break;
+
+          slots.push({
+            startTime: format(currentSlot, 'HH:mm'),
+            endTime: format(slotEnd, 'HH:mm'),
+          });
+
+          currentSlot = slotEnd;
+        }
+      } catch {
+        // Ignore one malformed window without hiding other valid windows.
+      }
     }
+
+    return slots;
   }
 
   /** Merged list of slot start times (HH:mm) for a date from all active doctors (for date-first booking flow) */

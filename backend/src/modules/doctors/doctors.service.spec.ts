@@ -192,9 +192,29 @@ describe('DoctorsService', () => {
       const result = await service.getAvailabilities('doc-1');
       expect(availabilityRepo.find).toHaveBeenCalledWith({
         where: { doctorId: 'doc-1', isActive: true },
-        order: { dayOfWeek: 'ASC' },
+        order: { dayOfWeek: 'ASC', startTime: 'ASC' },
       });
       expect(result).toEqual(avails);
+    });
+  });
+
+  describe('getAvailableSlots', () => {
+    it('merges slots from multiple windows on the same day', async () => {
+      doctorsRepo.findOne.mockResolvedValue({ id: 'doc-1' });
+      leaveRepo.findOne.mockResolvedValue(null);
+      availabilityRepo.find.mockResolvedValue([
+        mockAvailability({ startTime: '07:00', endTime: '08:00', slotDuration: 30 }),
+        mockAvailability({ id: 'avail-2', startTime: '16:00', endTime: '17:00', slotDuration: 30 }),
+      ]);
+
+      const result = await service.getAvailableSlots('doc-1', '2026-08-24');
+
+      expect(result).toEqual([
+        { startTime: '07:00', endTime: '07:30' },
+        { startTime: '07:30', endTime: '08:00' },
+        { startTime: '16:00', endTime: '16:30' },
+        { startTime: '16:30', endTime: '17:00' },
+      ]);
     });
   });
 });

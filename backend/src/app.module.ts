@@ -82,7 +82,14 @@ import { RedisCacheModule } from './common/cache/redis-cache.module';
             // silently falls back to `public` and queries the wrong tables.
             schema: configService.get('DATABASE_SCHEMA', 'nita'),
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            // Honor explicit flag; otherwise default: dev on, prod off.
+            migrations: [__dirname + '/database/migrations/*{.js,.ts}'],
+            // Apply idempotent production migrations during boot so newly
+            // deployed availability/configuration data reaches the live DB.
+            migrationsRun:
+              configService.get('DATABASE_MIGRATIONS_RUN') !== undefined
+                ? configService.get('DATABASE_MIGRATIONS_RUN') === 'true' || configService.get('DATABASE_MIGRATIONS_RUN') === true
+                : configService.get('NODE_ENV') === 'production',
+            // Honor explicit flag; otherwise default: dev sync on, prod sync off.
             synchronize:
               configService.get('DATABASE_SYNCHRONIZE') !== undefined
                 ? configService.get('DATABASE_SYNCHRONIZE') === 'true' || configService.get('DATABASE_SYNCHRONIZE') === true
