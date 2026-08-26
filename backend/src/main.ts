@@ -104,9 +104,10 @@ async function bootstrap() {
     const primaryFrontend = configService.get('FRONTEND_URL', 'http://localhost:3000');
     const isDev = configService.get('NODE_ENV') !== 'production';
     const configuredFrontendOrigins = configService.get('FRONTEND_URLS', '');
+    const brandedFrontendOrigins = ['https://nitaclinics.com', 'https://www.nitaclinics.com'];
     const productionOrigins = Array.from(
       new Set(
-        [primaryFrontend, ...configuredFrontendOrigins.split(',')]
+        [primaryFrontend, ...configuredFrontendOrigins.split(','), ...brandedFrontendOrigins]
           .map((origin) => origin.trim())
           .filter(Boolean),
       ),
