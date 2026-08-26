@@ -1,6 +1,8 @@
 /** Railway env vars are sometimes host-only; rewrites need a valid absolute URL base. */
 function normalizeApiBase() {
-  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').trim();
+  // Keep the server-side rewrite pointed at the backend even when the browser
+  // client uses the branded first-party URL for same-origin API requests.
+  const raw = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').trim();
   if (/^https?:\/\//i.test(raw)) return raw.replace(/\/$/, '');
   const host = raw.replace(/^\/+/, '').replace(/\/$/, '');
   if (/^(localhost|127\.0\.0\.1)(\:|$)/i.test(host)) {
